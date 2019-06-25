@@ -3,7 +3,6 @@ package com.yuansfer.client;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
@@ -57,7 +56,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
     }
 
     /**
-     * 连接服务器，10次重连
+     * 连接服务器，多次重连
      */
     private synchronized void connectServer() {
         LogUtils.d(TAG, String.format("第%d次开始连接服务器...", ++mConnTime));
@@ -67,10 +66,11 @@ public class RetryConnectHandler extends Handler implements Runnable {
             IoSession session = connectFuture.getSession();
             if (session.isConnected()) {
                 LogUtils.d(TAG, "连接成功");
+                SocketClientManager.getInstance().saveSession(session);
                 //安全退出Looper线程
                 getLooper().quitSafely();
             } else {
-                waitNextConnect("");
+                waitNextConnect("session is not connected");
             }
         } catch (Exception e) {
             waitNextConnect(e.toString());
@@ -100,6 +100,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
         if (mConnTime < mRetryConnTimes) {
             sendEmptyMessage(CONN_WHAT);
         } else {
+            getLooper().quitSafely();
             LogUtils.d(TAG, "连接失败，退出重连");
         }
     }
