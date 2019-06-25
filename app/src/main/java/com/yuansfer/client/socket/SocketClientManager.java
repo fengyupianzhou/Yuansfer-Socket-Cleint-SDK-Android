@@ -1,6 +1,10 @@
-package com.yuansfer.client;
+package com.yuansfer.client.socket;
 
 import android.content.Context;
+
+import com.yuansfer.client.listener.ISessionListener;
+import com.yuansfer.client.listener.ISocketListener;
+import com.yuansfer.client.service.SocketClientService;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
@@ -55,7 +59,7 @@ public class SocketClientManager {
      *
      * @param session
      */
-    void saveSession(IoSession session) {
+    public void saveSession(IoSession session) {
         mSession = session;
     }
 

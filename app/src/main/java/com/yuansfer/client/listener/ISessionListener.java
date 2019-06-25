@@ -1,4 +1,4 @@
-package com.yuansfer.client;
+package com.yuansfer.client.listener;
 
 import org.apache.mina.core.session.IoSession;
 /**

@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".SocketClientService"
+            android:name=".service.SocketClientService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.android.service.action.SocketClientService" />

@@ -1,10 +1,12 @@
-package com.yuansfer.client;
+package com.yuansfer.client.utils;
 
 import android.util.Log;
 
+import com.yuansfer.client.BuildConfig;
+
 public class LogUtils {
 
-    private static final String TAG = "LogUtils";
+    private static final String TAG = "YuansferSocketClient";
 
     public static void d(String msg) {
         if (BuildConfig.DEBUG) {

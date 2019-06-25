@@ -9,9 +9,8 @@ package com.yuansfer.client.netmonitor;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.yuansfer.client.LogUtils;
+import com.yuansfer.client.utils.LogUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,11 +25,10 @@ import java.util.Set;
 public class NetMonitor implements MonitorCallback {
 
     private final Set<NetChangeObserver> mNetChangeObservers;
-    public static final String TAG = NetMonitor.class.getSimpleName();
 
     @Override
     public void notifyChanged(int netState) {
-        LogUtils.d(TAG, "NetMonitor notifyChanged netChangeObservers size: " + mNetChangeObservers.size());
+        LogUtils.d( "NetMonitor notifyChanged netChangeObservers size: " + mNetChangeObservers.size());
         for (NetChangeObserver observer : mNetChangeObservers) {
             if (netState == NetworkState.NET_CONNECTED) {
                 observer.onNetConnected();
@@ -57,7 +55,7 @@ public class NetMonitor implements MonitorCallback {
      * @param context
      */
     public void start(@NonNull Context context) {
-        LogUtils.d(TAG, "NetMonitor start with BroadcastReceiver.");
+        LogUtils.d( "NetMonitor start with BroadcastReceiver.");
         NetworkChangedReceiver.registerNetworkStateReceiver(context, this);
     }
 
@@ -66,7 +64,7 @@ public class NetMonitor implements MonitorCallback {
      * @param context
      */
     public void release(@NonNull Context context) {
-        LogUtils.d(TAG, "NetMonitor release");
+        LogUtils.d( "NetMonitor release");
         NetworkChangedReceiver.unRegisterNetworkStateReceiver(context);
         removeAllObserver();
     }
@@ -77,7 +75,7 @@ public class NetMonitor implements MonitorCallback {
      * @param context
      */
     public void checkNetworkState(Context context) {
-        LogUtils.d(TAG, "NetMonitor checkNetworkState");
+        LogUtils.d( "NetMonitor checkNetworkState");
         NetworkChangedReceiver.checkNetworkState(context);
 
         /*

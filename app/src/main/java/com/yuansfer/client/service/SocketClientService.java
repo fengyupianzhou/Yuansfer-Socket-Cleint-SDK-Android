@@ -1,12 +1,15 @@
-package com.yuansfer.client;
+package com.yuansfer.client.service;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.yuansfer.client.socket.SocketClientConnector;
+import com.yuansfer.client.socket.SocketConfig;
 import com.yuansfer.client.netmonitor.NetChangeObserver;
 import com.yuansfer.client.netmonitor.NetMonitor;
+import com.yuansfer.client.utils.LogUtils;
 
 /**
  * @Author Fly-Android

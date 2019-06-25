@@ -1,10 +1,12 @@
-package com.yuansfer.client;
+package com.yuansfer.client.socket;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
+import com.yuansfer.client.utils.LogUtils;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.service.IoService;
@@ -16,7 +18,6 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
-import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
 /**
@@ -32,7 +33,6 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     private static final int SESSION_MSG_RECEIVE_WHAT = SESSION_MSG_SENT_WHAT + 1;
     private static final int SOCKET_CONN_OPEN_WHAT = SESSION_MSG_RECEIVE_WHAT + 1;
     private static final int SOCKET_CONN_CLOSE_WHAT = SOCKET_CONN_OPEN_WHAT + 1;
-    private static final String TAG = SocketClientConnector.class.getSimpleName();
     private NioSocketConnector mSocketConnector;
     private RetryConnectHandler mConnectHandler;
     private SocketConfig mSocketConfig;
@@ -105,14 +105,11 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
      * 开始连接
      */
     public void startConnection() {
-        if (mConnectHandler != null) {
-            mConnectHandler.removeCallbacksAndMessages(null);
-            mConnectHandler = null;
-        }
         if (mSocketConnector.isDisposed()) {
             initConnector(mSocketConfig);
         }
-        HandlerThread handlerThread = new HandlerThread(TAG);
+        sendQuitMessageIfNeed();
+        HandlerThread handlerThread = new HandlerThread("SocketClientConnector");
         handlerThread.start();
         mConnectHandler = new RetryConnectHandler(mSocketConnector, mSocketConfig.getRemoteAddress()
                 , mSocketConfig.getRemotePort(), mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
@@ -124,28 +121,36 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
      * 断开连接
      */
     public void dismissConnection() {
-        if (mConnectHandler != null
-                && !SocketClientManager.getInstance().isConnSuccess()) {
-            mConnectHandler.sendEmptyMessage(RetryConnectHandler.DIS_WHAT);
-        }
+        sendQuitMessageIfNeed();
         SocketClientManager.getInstance().deleteSession();
         mSocketConnector.dispose();
     }
 
+    /**
+     * 发送线程退出消息如还在运行
+     */
+    private void sendQuitMessageIfNeed() {
+        if (mConnectHandler != null
+                && !mConnectHandler.isThreadClosed()) {
+            mConnectHandler.sendEmptyMessage(RetryConnectHandler.DIS_WHAT);
+            mConnectHandler = null;
+        }
+    }
+
     @Override
     public void serviceActivated(IoService ioService) throws Exception {
-        LogUtils.d(TAG, "serviceActivated");
+        LogUtils.d("serviceActivated");
         sHandler.obtainMessage(SOCKET_CONN_OPEN_WHAT, ioService).sendToTarget();
     }
 
     @Override
     public void serviceIdle(IoService ioService, IdleStatus idleStatus) throws Exception {
-        LogUtils.d(TAG, "serviceActivated");
+        LogUtils.d("serviceActivated");
     }
 
     @Override
     public void serviceDeactivated(IoService ioService) throws Exception {
-        LogUtils.d(TAG, "serviceDeactivated");
+        LogUtils.d("serviceDeactivated");
         sHandler.obtainMessage(SOCKET_CONN_CLOSE_WHAT, ioService).sendToTarget();
         if (!ioService.isDisposed()) {
             //非主动关闭连接断开后再次连接
@@ -156,13 +161,13 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     @Override
     public void sessionCreated(IoSession session) throws Exception {
         super.sessionCreated(session);
-        LogUtils.d(TAG, "sessionCreated");
+        LogUtils.d("sessionCreated");
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
         super.sessionOpened(session);
-        LogUtils.d(TAG, "sessionOpened");
+        LogUtils.d("sessionOpened");
         SocketClientManager.getInstance().saveSession(session);
         sHandler.obtainMessage(SESSION_ADD_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
     }
@@ -170,39 +175,39 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         super.sessionClosed(session);
-        LogUtils.d(TAG, "sessionClosed");
+        LogUtils.d("sessionClosed");
         SocketClientManager.getInstance().deleteSession();
         sHandler.obtainMessage(SESSION_REMOVE_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
     }
 
     @Override
     public void sessionDestroyed(IoSession session) throws Exception {
-        LogUtils.d(TAG, "sessionDestroyed");
+        LogUtils.d("sessionDestroyed");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         super.sessionIdle(session, status);
-        LogUtils.d(TAG, "sessionIdle");
+        LogUtils.d("sessionIdle");
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         super.exceptionCaught(session, cause);
-        LogUtils.d(TAG, "sessionDestroyed" + Log.getStackTraceString(cause));
+        LogUtils.d("sessionDestroyed" + Log.getStackTraceString(cause));
     }
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         super.messageReceived(session, message);
-        LogUtils.d(TAG, "messageReceived");
+        LogUtils.d("messageReceived");
         sHandler.obtainMessage(SESSION_MSG_RECEIVE_WHAT, SessionMsgObj.obtain(session, message)).sendToTarget();
     }
 
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
         super.messageSent(session, message);
-        LogUtils.d(TAG, "messageSent");
+        LogUtils.d("messageSent");
         sHandler.obtainMessage(SESSION_MSG_SENT_WHAT, SessionMsgObj.obtain(session, message)).sendToTarget();
     }
 

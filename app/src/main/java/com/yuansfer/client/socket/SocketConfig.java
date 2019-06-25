@@ -1,4 +1,4 @@
-package com.yuansfer.client;
+package com.yuansfer.client.socket;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -2,19 +2,16 @@ package test;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.yuansfer.client.ISessionListener;
-import com.yuansfer.client.ISocketListener;
+import com.yuansfer.client.listener.ISessionListener;
+import com.yuansfer.client.listener.ISocketListener;
 import com.yuansfer.client.R;
-import com.yuansfer.client.SocketClientConnector;
-import com.yuansfer.client.SocketClientManager;
-import com.yuansfer.client.SocketClientService;
-import com.yuansfer.client.SocketConfig;
+import com.yuansfer.client.socket.SocketClientManager;
+import com.yuansfer.client.service.SocketClientService;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
