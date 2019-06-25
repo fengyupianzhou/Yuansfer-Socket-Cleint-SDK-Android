@@ -3,10 +3,13 @@ package com.yuansfer.client;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+
+import java.net.InetSocketAddress;
 
 /**
  * @Author Fly-Android
@@ -15,27 +18,42 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  */
 public class RetryConnectHandler extends Handler implements Runnable {
 
-    public static final int CONN_WHAT = 0;
+    public static final int INIT_WHAT = 0;
+    public static final int CONN_WHAT = INIT_WHAT + 1;
     public static final int DIS_WHAT = CONN_WHAT + 1;
     private static final String TAG = RetryConnectHandler.class.getSimpleName();
     private NioSocketConnector mSocketConnector;
+    private String mRemoteAddress;
+    private int mRemotePort;
     private int mRetryConnTimes;
     private int mConnTime = 0;
 
-    public RetryConnectHandler(NioSocketConnector connector, int retryConnTime, Looper looper) {
+    public RetryConnectHandler(NioSocketConnector connector
+            , String address, int port, int retryConnTime, Looper looper) {
         super(looper);
         mSocketConnector = connector;
+        mRemoteAddress = address;
+        mRemotePort = port;
         mRetryConnTimes = retryConnTime;
     }
 
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
-        if (msg.what == CONN_WHAT) {
+        if (msg.what == INIT_WHAT) {
+            initAddressPort();
+        } else if (msg.what == CONN_WHAT) {
             connectServer();
         } else if (msg.what == DIS_WHAT) {
             disConnectServer();
         }
+    }
+
+    /**
+     * 初始化Server地址和端口
+     */
+    private synchronized void initAddressPort() {
+        mSocketConnector.setDefaultRemoteAddress(new InetSocketAddress(mRemoteAddress, mRemotePort));
     }
 
     /**
@@ -55,14 +73,14 @@ public class RetryConnectHandler extends Handler implements Runnable {
                 waitNextConnect("");
             }
         } catch (Exception e) {
-            waitNextConnect(e.getMessage());
+            waitNextConnect(e.toString());
         }
     }
 
     /**
-     * 退出连接
+     * 退出循环条件和线程
      */
-    private void disConnectServer() {
+    private synchronized void disConnectServer() {
         LogUtils.d(TAG, "关闭socket连接");
         mConnTime = mRetryConnTimes;
         //安全退出Thread
@@ -73,7 +91,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
      * 等待下次重连
      */
     private synchronized void waitNextConnect(String reason) {
-        LogUtils.d(TAG, reason + "连接失败，5秒后重连...");
+        LogUtils.d(TAG, reason + "->连接失败，5秒后重连...");
         postDelayed(this, 5_000);
     }
 

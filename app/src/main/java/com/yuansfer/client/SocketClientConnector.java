@@ -93,7 +93,6 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         mSocketConfig = config;
         mSocketConnector = new NioSocketConnector();
         mSocketConnector.setConnectTimeoutMillis(1000 * config.getConnTimeout());
-        mSocketConnector.setDefaultRemoteAddress(new InetSocketAddress(config.getRemoteAddress(), config.getRemotePort()));
         mSocketConnector.getSessionConfig().setBothIdleTime(config.getIdleTime());
         mSocketConnector.getSessionConfig().setReadBufferSize(config.getBufferSize());
         mSocketConnector.getFilterChain().addLast("logging", new LoggingFilter());
@@ -115,8 +114,9 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         }
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
-        mConnectHandler = new RetryConnectHandler(mSocketConnector
-                , mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
+        mConnectHandler = new RetryConnectHandler(mSocketConnector, mSocketConfig.getRemoteAddress()
+                , mSocketConfig.getRemotePort(), mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
+        mConnectHandler.sendEmptyMessage(RetryConnectHandler.INIT_WHAT);
         mConnectHandler.sendEmptyMessage(RetryConnectHandler.CONN_WHAT);
     }
 
