@@ -5,7 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-public class SocketClientService extends Service {
+import com.yuansfer.client.netmonitor.NetChangeObserver;
+import com.yuansfer.client.netmonitor.NetMonitor;
+
+/**
+ * @Author Fly-Android
+ * @CreateDate 2019/6/25 15:20
+ * @Desciption Sokcet客户端Service
+ */
+public class SocketClientService extends Service implements NetChangeObserver {
 
     private static final String ACTION_SOCKET_SERVER_SERVICE = "com.android.service.action.SocketClientService";
     private SocketClientConnector mSocketConnector;
@@ -34,6 +42,13 @@ public class SocketClientService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        NetMonitor.getInstance().start(this);
+        NetMonitor.getInstance().registerObserver(this);
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
@@ -41,18 +56,35 @@ public class SocketClientService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && mSocketConnector == null) {
-            SocketConfig config = (SocketConfig) intent.getSerializableExtra("config");
+            SocketConfig config = intent.getParcelableExtra("config");
             mSocketConnector = new SocketClientConnector(config);
-            mSocketConnector.startConnection();
         }
         return Service.START_STICKY;
     }
 
     @Override
+    public void onNetConnected() {
+        LogUtils.d("网络已连接");
+        if (mSocketConnector != null) {
+            mSocketConnector.startConnection();
+        }
+    }
+
+    @Override
+    public void onNetDisConnect() {
+        LogUtils.d("网络已断开");
+        if (mSocketConnector != null) {
+            mSocketConnector.dismissConnection();
+        }
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        NetMonitor.getInstance().removeObserver(this);
+        NetMonitor.getInstance().release(this);
         if (mSocketConnector != null) {
-            mSocketConnector.stopConnection();
+            mSocketConnector.dismissConnection();
             mSocketConnector = null;
         }
     }

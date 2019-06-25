@@ -1,8 +1,11 @@
 package com.yuansfer.client;
 
+import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 
-import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.IoServiceListener;
@@ -23,36 +26,73 @@ import java.nio.charset.Charset;
  */
 public class SocketClientConnector extends IoHandlerAdapter implements IoServiceListener {
 
+    private static final int SESSION_ADD_WHAT = 0;
+    private static final int SESSION_REMOVE_WHAT = SESSION_ADD_WHAT + 1;
+    private static final int SESSION_MSG_SENT_WHAT = SESSION_REMOVE_WHAT + 1;
+    private static final int SESSION_MSG_RECEIVE_WHAT = SESSION_MSG_SENT_WHAT + 1;
+    private static final int SOCKET_CONN_OPEN_WHAT = SESSION_MSG_RECEIVE_WHAT + 1;
+    private static final int SOCKET_CONN_CLOSE_WHAT = SOCKET_CONN_OPEN_WHAT + 1;
+    private static final String TAG = SocketClientConnector.class.getSimpleName();
     private NioSocketConnector mSocketConnector;
-    private SocketConnectorThread mSocketThread;
-
-    private class SocketConnectorThread extends HandlerThread {
-
-        public SocketConnectorThread() {
-            super(SocketConnectorThread.class.getSimpleName());
-        }
-
+    private RetryConnectHandler mConnectHandler;
+    private SocketConfig mSocketConfig;
+    private static Handler sHandler = new Handler(Looper.getMainLooper()) {
         @Override
-        protected void onLooperPrepared() {
-            super.onLooperPrepared();
-            ConnectFuture connectFuture = mSocketConnector.connect();
-            connectFuture.awaitUninterruptibly();
-            IoSession session = connectFuture.getSession();
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SOCKET_CONN_OPEN_WHAT:
+                    SocketClientManager.getInstance().notifySocketCreated((IoService) msg.obj);
+                    break;
+                case SOCKET_CONN_CLOSE_WHAT:
+                    SocketClientManager.getInstance().notifySocketDestroyed((IoService) msg.obj);
+                    break;
+                case SESSION_ADD_WHAT:
+                    SocketClientManager.getInstance().notifySessionCreated(((SessionMsgObj) msg.obj).session);
+                    break;
+                case SESSION_REMOVE_WHAT:
+                    SocketClientManager.getInstance().notifySessionDestroyed(((SessionMsgObj) msg.obj).session);
+                    break;
+                case SESSION_MSG_SENT_WHAT:
+                    SocketClientManager.getInstance().notifySessionMessageSent(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
+                    break;
+                case SESSION_MSG_RECEIVE_WHAT:
+                    SocketClientManager.getInstance().notifySessionMessageReceive(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
+                    break;
+            }
+        }
+    };
+
+    private static class SessionMsgObj {
+        public IoSession session;
+        public Object message;
+
+        public static SessionMsgObj obtain(IoSession session) {
+            SessionMsgObj obj = new SessionMsgObj();
+            obj.session = session;
+            return obj;
         }
 
-        public void disconnect() {
-            mSocketConnector.dispose();
-            quit();
+        public static SessionMsgObj obtain(IoSession session, Object message) {
+            SessionMsgObj obj = new SessionMsgObj();
+            obj.session = session;
+            obj.message = message;
+            return obj;
         }
-
     }
 
     public SocketClientConnector(SocketConfig config) {
         initConnector(config);
     }
 
+    /**
+     * 初始化connector
+     *
+     * @param config
+     */
     private void initConnector(SocketConfig config) {
+        mSocketConfig = config;
         mSocketConnector = new NioSocketConnector();
+        mSocketConnector.setConnectTimeoutMillis(1000 * config.getConnTimeout());
         mSocketConnector.setDefaultRemoteAddress(new InetSocketAddress(config.getRemoteAddress(), config.getRemotePort()));
         mSocketConnector.getSessionConfig().setBothIdleTime(config.getIdleTime());
         mSocketConnector.getSessionConfig().setReadBufferSize(config.getBufferSize());
@@ -62,74 +102,108 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         mSocketConnector.addListener(this);
     }
 
+    /**
+     * 开始连接
+     */
     public void startConnection() {
-        if (mSocketThread != null) {
-            mSocketThread.disconnect();
-            mSocketThread = null;
+        if (mConnectHandler != null) {
+            mConnectHandler.removeCallbacksAndMessages(null);
+            mConnectHandler = null;
         }
-        mSocketThread = new SocketConnectorThread();
-        mSocketThread.start();
+        if (mSocketConnector.isDisposed()) {
+            initConnector(mSocketConfig);
+        }
+        HandlerThread handlerThread = new HandlerThread(TAG);
+        handlerThread.start();
+        mConnectHandler = new RetryConnectHandler(mSocketConnector
+                , mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
+        mConnectHandler.sendEmptyMessage(RetryConnectHandler.CONN_WHAT);
     }
 
-    public void stopConnection() {
-        if (mSocketThread != null) {
-            mSocketThread.disconnect();
+    /**
+     * 断开连接
+     */
+    public void dismissConnection() {
+        if (mConnectHandler != null
+                && !SocketClientManager.getInstance().isConnSuccess()) {
+            mConnectHandler.sendEmptyMessage(RetryConnectHandler.DIS_WHAT);
+        }
+        SocketClientManager.getInstance().deleteSession();
+        mSocketConnector.dispose();
+    }
+
+    @Override
+    public void serviceActivated(IoService ioService) throws Exception {
+        LogUtils.d(TAG, "serviceActivated");
+        sHandler.obtainMessage(SOCKET_CONN_OPEN_WHAT, ioService).sendToTarget();
+    }
+
+    @Override
+    public void serviceIdle(IoService ioService, IdleStatus idleStatus) throws Exception {
+        LogUtils.d(TAG, "serviceActivated");
+    }
+
+    @Override
+    public void serviceDeactivated(IoService ioService) throws Exception {
+        LogUtils.d(TAG, "serviceDeactivated");
+        sHandler.obtainMessage(SOCKET_CONN_CLOSE_WHAT, ioService).sendToTarget();
+        if (!ioService.isDisposed()) {
+            //非主动关闭连接断开后再次连接
+            startConnection();
         }
     }
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
         super.sessionCreated(session);
+        LogUtils.d(TAG, "sessionCreated");
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
         super.sessionOpened(session);
+        LogUtils.d(TAG, "sessionOpened");
+        SocketClientManager.getInstance().saveSession(session);
+        sHandler.obtainMessage(SESSION_ADD_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
     }
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         super.sessionClosed(session);
+        LogUtils.d(TAG, "sessionClosed");
+        SocketClientManager.getInstance().deleteSession();
+        sHandler.obtainMessage(SESSION_REMOVE_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
+    }
+
+    @Override
+    public void sessionDestroyed(IoSession session) throws Exception {
+        LogUtils.d(TAG, "sessionDestroyed");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         super.sessionIdle(session, status);
+        LogUtils.d(TAG, "sessionIdle");
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         super.exceptionCaught(session, cause);
+        LogUtils.d(TAG, "sessionDestroyed" + Log.getStackTraceString(cause));
     }
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         super.messageReceived(session, message);
+        LogUtils.d(TAG, "messageReceived");
+        sHandler.obtainMessage(SESSION_MSG_RECEIVE_WHAT, SessionMsgObj.obtain(session, message)).sendToTarget();
     }
 
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
         super.messageSent(session, message);
-    }
-
-    @Override
-    public void serviceActivated(IoService ioService) throws Exception {
-
-    }
-
-    @Override
-    public void serviceIdle(IoService ioService, IdleStatus idleStatus) throws Exception {
-
-    }
-
-    @Override
-    public void serviceDeactivated(IoService ioService) throws Exception {
-
-    }
-
-    @Override
-    public void sessionDestroyed(IoSession ioSession) throws Exception {
-
+        LogUtils.d(TAG, "messageSent");
+        sHandler.obtainMessage(SESSION_MSG_SENT_WHAT, SessionMsgObj.obtain(session, message)).sendToTarget();
     }
 
 }

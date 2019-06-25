@@ -13,16 +13,22 @@ public class SocketConfig implements Parcelable {
     public static final int DEFAULT_PORT = 6189;   //默认端口
     public static final int DEFAULT_IDLE_TIME = 30;    //空间时间间隔
     public static final int DEFAULT_READ_BUFFER_SIZE = 2048; //缓冲区大小
+    public static final int DEFAULT_CONN_TIMEOUT = 15; //连接超时时间
+    public static final int MAX_RETRY_CONN_TIMES = 10; //最大重断次数
     private String remoteAddress;
     private int remotePort;
     private int idleTime;
+    private int connTimeout;
     private int bufferSize;
+    private int retryConnTimes;
 
     private SocketConfig(SocketConfigBuilder builder) {
         this.remoteAddress = builder.remoteAddress;
         this.remotePort = builder.remotePort;
         this.idleTime = builder.idleTime;
         this.bufferSize = builder.bufferSize;
+        this.connTimeout = builder.connTimeout;
+        this.retryConnTimes = builder.retryConnTimes;
     }
 
     protected SocketConfig(Parcel in) {
@@ -30,6 +36,8 @@ public class SocketConfig implements Parcelable {
         remotePort = in.readInt();
         idleTime = in.readInt();
         bufferSize = in.readInt();
+        connTimeout = in.readInt();
+        retryConnTimes = in.readInt();
     }
 
     public static class SocketConfigBuilder {
@@ -37,6 +45,8 @@ public class SocketConfig implements Parcelable {
         private int remotePort = DEFAULT_PORT;
         private int idleTime = DEFAULT_IDLE_TIME;
         private int bufferSize = DEFAULT_READ_BUFFER_SIZE;
+        private int connTimeout = DEFAULT_CONN_TIMEOUT;
+        private int retryConnTimes = MAX_RETRY_CONN_TIMES;
 
         public SocketConfigBuilder setRemoteAddress(String remoteAddress) {
             this.remoteAddress = remoteAddress;
@@ -58,6 +68,16 @@ public class SocketConfig implements Parcelable {
             return this;
         }
 
+        public SocketConfigBuilder setConnTimeout(int connTimeout) {
+            this.connTimeout = connTimeout;
+            return this;
+        }
+
+        public SocketConfigBuilder setRetryConnTimes(int retryConnTimes) {
+            this.retryConnTimes = retryConnTimes;
+            return this;
+        }
+
         public SocketConfig build() {
             return new SocketConfig(this);
         }
@@ -70,6 +90,8 @@ public class SocketConfig implements Parcelable {
         dest.writeInt(remotePort);
         dest.writeInt(idleTime);
         dest.writeInt(bufferSize);
+        dest.writeInt(connTimeout);
+        dest.writeInt(retryConnTimes);
     }
 
     @Override
@@ -93,31 +115,24 @@ public class SocketConfig implements Parcelable {
         return remoteAddress;
     }
 
-    public void setRemoteAddress(String remoteAddress) {
-        this.remoteAddress = remoteAddress;
-    }
-
     public int getRemotePort() {
         return remotePort;
-    }
-
-    public void setRemotePort(int remotePort) {
-        this.remotePort = remotePort;
     }
 
     public int getIdleTime() {
         return idleTime;
     }
 
-    public void setIdleTime(int idleTime) {
-        this.idleTime = idleTime;
-    }
-
     public int getBufferSize() {
         return bufferSize;
     }
 
-    public void setBufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
+    public int getConnTimeout() {
+        return connTimeout;
     }
+
+    public int getRetryConnTimes() {
+        return retryConnTimes;
+    }
+
 }
