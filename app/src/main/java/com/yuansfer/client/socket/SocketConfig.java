@@ -14,7 +14,7 @@ public class SocketConfig implements Parcelable {
     public static final int DEFAULT_IDLE_TIME = 30;    //空间时间间隔
     public static final int DEFAULT_READ_BUFFER_SIZE = 2048; //缓冲区大小
     public static final int DEFAULT_CONN_TIMEOUT = 15; //连接超时时间
-    public static final int MAX_RETRY_CONN_TIMES = 10; //最大重断次数
+    public static final int MAX_RETRY_CONN_TIMES = 10; //最大重连次数
     private String remoteAddress;
     private int remotePort;
     private int idleTime;

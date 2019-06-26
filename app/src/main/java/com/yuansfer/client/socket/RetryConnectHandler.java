@@ -4,8 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.yuansfer.client.socket.SocketClientManager;
-import com.yuansfer.client.utils.LogUtils;
+import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
@@ -23,6 +22,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
     public static final int INIT_WHAT = 0;
     public static final int CONN_WHAT = INIT_WHAT + 1;
     public static final int DIS_WHAT = CONN_WHAT + 1;
+    private static final int RETRY_INTERVAL_MILLIS = 10_000;
     private NioSocketConnector mSocketConnector;
     private String mRemoteAddress;
     private int mRemotePort;
@@ -77,6 +77,10 @@ public class RetryConnectHandler extends Handler implements Runnable {
             } else {
                 waitNextConnect("session is not connected");
             }
+        } catch (IllegalStateException e) {
+            //SocketConnector is disposed
+            LogUtils.d(e.toString());
+            disConnectServer();
         } catch (Exception e) {
             waitNextConnect(e.toString());
         }
@@ -97,9 +101,9 @@ public class RetryConnectHandler extends Handler implements Runnable {
      * 等待下次重连
      */
     private synchronized void waitNextConnect(String reason) {
-        LogUtils.d(reason + "->连接失败，5秒后重连...");
+        LogUtils.d(reason + "->连接失败，10秒后重连...");
         if (mConnTime < mRetryConnTimes) {
-            postDelayed(this, 5_000);
+            postDelayed(this, RETRY_INTERVAL_MILLIS);
         } else {
             LogUtils.d("连接失败，退出重连");
         }
@@ -117,6 +121,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
 
     /**
      * 线程是否已退出
+     *
      * @return
      */
     public boolean isThreadClosed() {

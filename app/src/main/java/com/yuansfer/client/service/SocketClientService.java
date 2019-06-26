@@ -9,7 +9,7 @@ import com.yuansfer.client.socket.SocketClientConnector;
 import com.yuansfer.client.socket.SocketConfig;
 import com.yuansfer.client.netmonitor.NetChangeObserver;
 import com.yuansfer.client.netmonitor.NetMonitor;
-import com.yuansfer.client.utils.LogUtils;
+import com.yuansfer.client.util.LogUtils;
 
 /**
  * @Author Fly-Android

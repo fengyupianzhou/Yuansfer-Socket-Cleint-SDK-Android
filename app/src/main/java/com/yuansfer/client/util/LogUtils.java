@@ -1,4 +1,4 @@
-package com.yuansfer.client.utils;
+package com.yuansfer.client.util;
 
 import android.util.Log;
 

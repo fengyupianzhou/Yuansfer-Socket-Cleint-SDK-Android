@@ -10,7 +10,7 @@ package com.yuansfer.client.netmonitor;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.yuansfer.client.utils.LogUtils;
+import com.yuansfer.client.util.LogUtils;
 
 import java.util.HashSet;
 import java.util.Set;
