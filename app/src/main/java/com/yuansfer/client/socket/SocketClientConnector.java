@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.yuansfer.client.socket.protocol.SocketProtocolCodecFactory;
 import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -14,12 +15,9 @@ import org.apache.mina.core.service.IoServiceListener;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.keepalive.KeepAliveFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-
-import java.nio.charset.Charset;
 
 /**
  * @Author Fly-Android
@@ -98,7 +96,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         mSocketConnector.getSessionConfig().setReadBufferSize(config.getBufferSize());
         mSocketConnector.getSessionConfig().setKeepAlive(true);
         mSocketConnector.getFilterChain().addLast("logging", new LoggingFilter());
-        mSocketConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+        mSocketConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new SocketProtocolCodecFactory()));
         mSocketConnector.getFilterChain().addLast("heartbeat", new KeepAliveFilter(new KeepAliveFactoryImpl()));
         mSocketConnector.setHandler(this);
         mSocketConnector.addListener(this);

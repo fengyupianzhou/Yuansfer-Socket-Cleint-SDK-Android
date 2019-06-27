@@ -7,8 +7,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.yuansfer.client.listener.ISessionListener;
-import com.yuansfer.client.listener.ISocketListener;
+import com.yuansfer.client.business.request.GetServerTimeRequest;
+import com.yuansfer.client.socket.protocol.SocketMessage;
+import com.yuansfer.client.socket.listener.ISessionListener;
+import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.R;
 import com.yuansfer.client.socket.SocketClientManager;
 import com.yuansfer.client.service.SocketClientService;
@@ -43,18 +45,18 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientManager.getInstance().sendMessage("I am socket client");
+                SocketClientManager.getInstance().sendMessage(new GetServerTimeRequest());
             }
         });
         SocketClientManager.getInstance().setOnSocketListener(new ISocketListener() {
             @Override
             public void onSocketStart(IoService service) {
-                tvRet.append("Socket服务已连接\n");
+                tvRet.setText("Socket服务已连接\n");
             }
 
             @Override
             public void onSocketStop(IoService service) {
-                tvRet.append("Socket服务已关闭\n");
+                tvRet.setText("Socket服务已关闭\n");
             }
         });
         SocketClientManager.getInstance().setOnSessionListener(new ISessionListener() {

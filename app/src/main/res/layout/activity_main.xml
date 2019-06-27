@@ -19,35 +19,26 @@
         android:inputType="number"
         android:text="6189" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="connect server"
+        android:textAllCaps="false" />
 
-        <Button
-            android:id="@+id/btn1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="connect server"
-            android:textAllCaps="false" />
+    <Button
+        android:id="@+id/btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop server"
+        android:textAllCaps="false" />
 
-        <Button
-            android:id="@+id/btn2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="stop server"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/btn3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="发送一条消息"
-            android:textAllCaps="false" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="向socket server获取最新时间"
+        android:textAllCaps="false" />
 
     <TextView
         android:id="@+id/tv_ret"

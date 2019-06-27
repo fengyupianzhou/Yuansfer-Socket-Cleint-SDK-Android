@@ -2,8 +2,11 @@ package com.yuansfer.client.socket;
 
 import android.content.Context;
 
-import com.yuansfer.client.listener.ISessionListener;
-import com.yuansfer.client.listener.ISocketListener;
+import com.google.gson.Gson;
+import com.yuansfer.client.business.request.BaseSocketRequest;
+import com.yuansfer.client.socket.listener.ISessionListener;
+import com.yuansfer.client.socket.listener.ISocketListener;
+import com.yuansfer.client.socket.protocol.SocketMessage;
 import com.yuansfer.client.service.SocketClientService;
 
 import org.apache.mina.core.service.IoService;
@@ -15,6 +18,7 @@ public class SocketClientManager {
     private IoSession mSession;
     private ISocketListener mSocketListener;
     private ISessionListener mSessionListener;
+    private static final Gson GSON = new Gson();
 
     private SocketClientManager() {
     }
@@ -42,14 +46,14 @@ public class SocketClientManager {
     /**
      * 发送消息
      *
-     * @param message
+     * @param t
      * @return
      */
-    public boolean sendMessage(String message) {
+    public <T extends BaseSocketRequest> boolean sendMessage(T t) {
         if (isConnSuccess()) {
-            return mSession.write(message).isWritten();
+            return mSession.write(SocketMessage.obtain(GSON.toJson(t))).isWritten();
         } else {
-            mSessionListener.onMessageSendFail(message, "not found server session");
+            mSessionListener.onMessageSendFail(SocketMessage.obtain(GSON.toJson(t)), "not found server session");
             return false;
         }
     }

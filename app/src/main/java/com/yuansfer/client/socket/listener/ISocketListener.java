@@ -1,4 +1,4 @@
-package com.yuansfer.client.listener;
+package com.yuansfer.client.socket.listener;
 
 import org.apache.mina.core.service.IoService;
 /**
