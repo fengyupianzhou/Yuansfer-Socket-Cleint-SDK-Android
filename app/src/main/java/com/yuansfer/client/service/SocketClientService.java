@@ -60,7 +60,7 @@ public class SocketClientService extends Service implements NetChangeObserver {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && mSocketConnector == null) {
             SocketConfig config = intent.getParcelableExtra("config");
-            mSocketConnector = new SocketClientConnector(config);
+            mSocketConnector = new SocketClientConnector(this, config);
         }
         return Service.START_STICKY;
     }

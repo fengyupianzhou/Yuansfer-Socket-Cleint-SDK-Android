@@ -9,7 +9,7 @@ public class BaseSocketReponse {
 
     //业务接口是否成功
     protected boolean isSuccess;
-    //提示
+    //响应提示
     protected String msg;
 
     public boolean isSuccess() {

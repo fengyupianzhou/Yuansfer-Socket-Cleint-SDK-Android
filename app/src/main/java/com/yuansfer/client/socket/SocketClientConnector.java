@@ -1,5 +1,6 @@
 package com.yuansfer.client.socket;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -35,6 +36,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     private NioSocketConnector mSocketConnector;
     private RetryConnectHandler mConnectHandler;
     private SocketConfig mSocketConfig;
+    private Context mContext;
     private static Handler sHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -79,7 +81,8 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         }
     }
 
-    public SocketClientConnector(SocketConfig config) {
+    public SocketClientConnector(Context context, SocketConfig config) {
+        mContext = context;
         initConnector(config);
     }
 
@@ -112,7 +115,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         sendQuitMessageIfNeed();
         HandlerThread handlerThread = new HandlerThread("SocketClientConnector");
         handlerThread.start();
-        mConnectHandler = new RetryConnectHandler(mSocketConnector, mSocketConfig.getRemoteAddress()
+        mConnectHandler = new RetryConnectHandler(mContext, mSocketConnector, mSocketConfig.getRemoteAddress()
                 , mSocketConfig.getRemotePort(), mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
         mConnectHandler.sendEmptyMessage(RetryConnectHandler.INIT_WHAT);
         mConnectHandler.sendEmptyMessage(RetryConnectHandler.CONN_WHAT);

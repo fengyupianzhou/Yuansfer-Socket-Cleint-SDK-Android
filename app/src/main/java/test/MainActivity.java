@@ -7,13 +7,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.yuansfer.client.business.request.GetServerTimeRequest;
-import com.yuansfer.client.socket.protocol.SocketMessage;
+import com.yuansfer.client.business.request.PushAmountRequest;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.R;
 import com.yuansfer.client.socket.SocketClientManager;
-import com.yuansfer.client.service.SocketClientService;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
@@ -32,20 +30,20 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientService.startService(MainActivity.this,
+                SocketClientManager.getInstance().startSocketConnect(MainActivity.this,
                         etIP.getText().toString(), Integer.parseInt(etPort.getText().toString()));
             }
         });
         findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientService.stopService(MainActivity.this);
+                SocketClientManager.getInstance().stopSocketConnect(MainActivity.this);
             }
         });
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientManager.getInstance().sendMessage(new GetServerTimeRequest());
+                SocketClientManager.getInstance().getInstance().sendMessage(new PushAmountRequest(0.01));
             }
         });
         SocketClientManager.getInstance().setOnSocketListener(new ISocketListener() {

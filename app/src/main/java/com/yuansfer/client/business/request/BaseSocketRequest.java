@@ -8,19 +8,19 @@ package com.yuansfer.client.business.request;
 public class BaseSocketRequest {
 
     //请求是否需要响应
-    protected boolean isNeedResponse = true;
+    protected boolean needResponse = true;
     protected String bizId;
 
     public BaseSocketRequest() {
         bizId = getBizId();
     }
 
-    public boolean isNeedResponse() {
-        return isNeedResponse;
+    public void setNeedResponse(boolean needResponse) {
+        this.needResponse = needResponse;
     }
 
-    public void setNeedResponse(boolean needResponse) {
-        isNeedResponse = needResponse;
+    public boolean isNeedResponse() {
+        return needResponse;
     }
 
     //业务ID号,类似请求地址

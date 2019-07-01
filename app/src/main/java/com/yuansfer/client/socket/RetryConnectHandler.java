@@ -1,9 +1,12 @@
 package com.yuansfer.client.socket;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.yuansfer.client.service.SocketClientService;
 import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.future.ConnectFuture;
@@ -24,15 +27,17 @@ public class RetryConnectHandler extends Handler implements Runnable {
     public static final int DIS_WHAT = CONN_WHAT + 1;
     private static final int RETRY_INTERVAL_MILLIS = 10_000;
     private NioSocketConnector mSocketConnector;
+    private Context mContext;
     private String mRemoteAddress;
     private int mRemotePort;
     private int mRetryConnTimes;
     private int mConnTime = 0;
     private boolean isThreadClosed;
 
-    public RetryConnectHandler(NioSocketConnector connector
+    public RetryConnectHandler(Context context, NioSocketConnector connector
             , String address, int port, int retryConnTime, Looper looper) {
         super(looper);
+        mContext = context;
         mSocketConnector = connector;
         mRemoteAddress = address;
         mRemotePort = port;
@@ -105,6 +110,8 @@ public class RetryConnectHandler extends Handler implements Runnable {
         if (mConnTime < mRetryConnTimes) {
             postDelayed(this, RETRY_INTERVAL_MILLIS);
         } else {
+            //关闭连接服务
+            SocketClientService.stopService(mContext);
             LogUtils.d("连接失败，退出重连");
         }
     }
