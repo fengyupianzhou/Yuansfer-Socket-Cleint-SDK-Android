@@ -5,7 +5,7 @@ package com.yuansfer.client.business.response;
  * @CreateDate 2019/6/27 16:29
  * @Desciption socket请求响应
  */
-public class BaseSocketReponse {
+public class BaseResponse {
 
     //业务接口是否成功
     protected boolean isSuccess;

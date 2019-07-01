@@ -3,7 +3,7 @@ package com.yuansfer.client.socket;
 import android.content.Context;
 
 import com.google.gson.Gson;
-import com.yuansfer.client.business.request.BaseSocketRequest;
+import com.yuansfer.client.business.request.BaseRequest;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.socket.protocol.SocketMessage;
@@ -49,7 +49,7 @@ public class SocketClientManager {
      * @param t
      * @return
      */
-    public <T extends BaseSocketRequest> boolean sendMessage(T t) {
+    public <T extends BaseRequest> boolean sendMessage(T t) {
         if (isConnSuccess()) {
             return mSession.write(SocketMessage.obtain(GSON.toJson(t))).isWritten();
         } else {

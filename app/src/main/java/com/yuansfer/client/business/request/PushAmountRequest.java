@@ -8,7 +8,7 @@ import com.yuansfer.client.business.BizIds;
  * @CreateDate 2019/7/1 10:21
  * @Desciption 向server发起金额推送
  */
-public class PushAmountRequest extends BaseSocketRequest {
+public class PushAmountRequest extends BaseRequest {
 
     private double amount;
 

@@ -5,13 +5,13 @@ package com.yuansfer.client.business.request;
  * @CreateDate 2019/6/27 16:32
  * @Desciption socket业务请求
  */
-public class BaseSocketRequest {
+public class BaseRequest {
 
     //请求是否需要响应
     protected boolean needResponse = true;
     protected String bizId;
 
-    public BaseSocketRequest() {
+    public BaseRequest() {
         bizId = getBizId();
     }
 
