@@ -25,7 +25,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * @CreateDate 2019/6/24 18:22
  * @Desciption Socket Client连接器
  */
-public class SocketClientConnector extends IoHandlerAdapter implements IoServiceListener {
+public class PosClientConnector extends IoHandlerAdapter implements IoServiceListener {
 
     private static final int SESSION_ADD_WHAT = 0;
     private static final int SESSION_REMOVE_WHAT = SESSION_ADD_WHAT + 1;
@@ -35,29 +35,29 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     private static final int SOCKET_CONN_CLOSE_WHAT = SOCKET_CONN_OPEN_WHAT + 1;
     private NioSocketConnector mSocketConnector;
     private RetryConnectHandler mConnectHandler;
-    private SocketConfig mSocketConfig;
+    private ConnectConfig mSocketConfig;
     private Context mContext;
     private static Handler sHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SOCKET_CONN_OPEN_WHAT:
-                    SocketClientManager.getInstance().notifySocketCreated((IoService) msg.obj);
+                    PosClientManager.getInstance().notifySocketCreated((IoService) msg.obj);
                     break;
                 case SOCKET_CONN_CLOSE_WHAT:
-                    SocketClientManager.getInstance().notifySocketDestroyed((IoService) msg.obj);
+                    PosClientManager.getInstance().notifySocketDestroyed((IoService) msg.obj);
                     break;
                 case SESSION_ADD_WHAT:
-                    SocketClientManager.getInstance().notifySessionCreated(((SessionMsgObj) msg.obj).session);
+                    PosClientManager.getInstance().notifySessionCreated(((SessionMsgObj) msg.obj).session);
                     break;
                 case SESSION_REMOVE_WHAT:
-                    SocketClientManager.getInstance().notifySessionDestroyed(((SessionMsgObj) msg.obj).session);
+                    PosClientManager.getInstance().notifySessionDestroyed(((SessionMsgObj) msg.obj).session);
                     break;
                 case SESSION_MSG_SENT_WHAT:
-                    SocketClientManager.getInstance().notifySessionMessageSent(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
+                    PosClientManager.getInstance().notifySessionMessageSent(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
                     break;
                 case SESSION_MSG_RECEIVE_WHAT:
-                    SocketClientManager.getInstance().notifySessionMessageReceive(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
+                    PosClientManager.getInstance().notifySessionMessageReceive(((SessionMsgObj) msg.obj).session, ((SessionMsgObj) msg.obj).message);
                     break;
             }
         }
@@ -81,7 +81,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
         }
     }
 
-    public SocketClientConnector(Context context, SocketConfig config) {
+    public PosClientConnector(Context context, ConnectConfig config) {
         mContext = context;
         initConnector(config);
     }
@@ -91,7 +91,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
      *
      * @param config
      */
-    private void initConnector(SocketConfig config) {
+    private void initConnector(ConnectConfig config) {
         mSocketConfig = config;
         mSocketConnector = new NioSocketConnector();
         mSocketConnector.setConnectTimeoutMillis(1000 * config.getConnTimeout());
@@ -113,7 +113,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
             initConnector(mSocketConfig);
         }
         sendQuitMessageIfNeed();
-        HandlerThread handlerThread = new HandlerThread("SocketClientConnector");
+        HandlerThread handlerThread = new HandlerThread("PosClientConnector");
         handlerThread.start();
         mConnectHandler = new RetryConnectHandler(mContext, mSocketConnector, mSocketConfig.getRemoteAddress()
                 , mSocketConfig.getRemotePort(), mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
@@ -126,7 +126,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
      */
     public void dismissConnection() {
         sendQuitMessageIfNeed();
-        SocketClientManager.getInstance().deleteSession();
+        PosClientManager.getInstance().deleteSession();
         mSocketConnector.dispose();
     }
 
@@ -172,7 +172,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     public void sessionOpened(IoSession session) throws Exception {
         super.sessionOpened(session);
         LogUtils.d("sessionOpened");
-        SocketClientManager.getInstance().saveSession(session);
+        PosClientManager.getInstance().saveSession(session);
         sHandler.obtainMessage(SESSION_ADD_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
     }
 
@@ -180,7 +180,7 @@ public class SocketClientConnector extends IoHandlerAdapter implements IoService
     public void sessionClosed(IoSession session) throws Exception {
         super.sessionClosed(session);
         LogUtils.d("sessionClosed");
-        SocketClientManager.getInstance().deleteSession();
+        PosClientManager.getInstance().deleteSession();
         sHandler.obtainMessage(SESSION_REMOVE_WHAT, SessionMsgObj.obtain(session)).sendToTarget();
     }
 

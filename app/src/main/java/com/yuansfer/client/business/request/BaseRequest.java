@@ -14,6 +14,10 @@ public abstract class BaseRequest {
     //请求是否需要响应
     protected boolean needResponse = true;
 
+    public boolean isNeedResponse() {
+        return needResponse;
+    }
+
     public final String getRequestId() {
         return requestId;
     }

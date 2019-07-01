@@ -8,7 +8,7 @@ import android.os.Parcelable;
  * @CreateDate 2019/6/24 18:16
  * @Desciption Socket配置
  */
-public class SocketConfig implements Parcelable {
+public class ConnectConfig implements Parcelable {
 
     public static final int DEFAULT_PORT = 6189;   //默认端口
     public static final int DEFAULT_IDLE_TIME = 30;    //空间时间间隔
@@ -22,7 +22,7 @@ public class SocketConfig implements Parcelable {
     private int bufferSize;
     private int retryConnTimes;
 
-    private SocketConfig(SocketConfigBuilder builder) {
+    private ConnectConfig(SocketConfigBuilder builder) {
         this.remoteAddress = builder.remoteAddress;
         this.remotePort = builder.remotePort;
         this.idleTime = builder.idleTime;
@@ -31,7 +31,7 @@ public class SocketConfig implements Parcelable {
         this.retryConnTimes = builder.retryConnTimes;
     }
 
-    protected SocketConfig(Parcel in) {
+    protected ConnectConfig(Parcel in) {
         remoteAddress = in.readString();
         remotePort = in.readInt();
         idleTime = in.readInt();
@@ -78,8 +78,8 @@ public class SocketConfig implements Parcelable {
             return this;
         }
 
-        public SocketConfig build() {
-            return new SocketConfig(this);
+        public ConnectConfig build() {
+            return new ConnectConfig(this);
         }
 
     }
@@ -99,15 +99,15 @@ public class SocketConfig implements Parcelable {
         return 0;
     }
 
-    public static final Creator<SocketConfig> CREATOR = new Creator<SocketConfig>() {
+    public static final Creator<ConnectConfig> CREATOR = new Creator<ConnectConfig>() {
         @Override
-        public SocketConfig createFromParcel(Parcel in) {
-            return new SocketConfig(in);
+        public ConnectConfig createFromParcel(Parcel in) {
+            return new ConnectConfig(in);
         }
 
         @Override
-        public SocketConfig[] newArray(int size) {
-            return new SocketConfig[size];
+        public ConnectConfig[] newArray(int size) {
+            return new ConnectConfig[size];
         }
     };
 

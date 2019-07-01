@@ -1,18 +1,16 @@
 package com.yuansfer.client.socket;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.ArrayMap;
 
 import com.google.gson.Gson;
-import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.BaseRequest;
 import com.yuansfer.client.business.response.BaseResponse;
 import com.yuansfer.client.socket.listener.IResponseListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.socket.protocol.SocketMessage;
-import com.yuansfer.client.service.SocketClientService;
+import com.yuansfer.client.service.PosClientService;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
@@ -25,25 +23,25 @@ import java.lang.reflect.Type;
  * @CreateDate 2019/7/1 12:04
  * @Desciption Socket 连接及会话管理器
  */
-public class SocketClientManager {
+public class PosClientManager {
 
-    private static SocketClientManager sInstance;
+    private static PosClientManager sInstance;
     private IoSession mSession;
     private ISocketListener mSocketListener;
     private ISessionListener mSessionListener;
     private ArrayMap<String, IResponseListener> mRespListenerMap;
     private Gson mGson;
 
-    private SocketClientManager() {
+    private PosClientManager() {
         mGson = new Gson();
         mRespListenerMap = new ArrayMap<>();
     }
 
-    public static SocketClientManager getInstance() {
+    public static PosClientManager getInstance() {
         if (sInstance == null) {
-            synchronized (SocketClientManager.class) {
+            synchronized (PosClientManager.class) {
                 if (sInstance == null) {
-                    sInstance = new SocketClientManager();
+                    sInstance = new PosClientManager();
                 }
             }
         }
@@ -83,7 +81,8 @@ public class SocketClientManager {
      */
     public <T extends BaseRequest, R extends BaseResponse> boolean sendMessage(T request, IResponseListener<R> listener) {
         if (isConnSuccess()) {
-            if (listener != null) {
+            if (listener != null && request.isNeedResponse()) {
+                //需要server反馈时加入回调集合
                 mRespListenerMap.put(request.getRequestId(), listener);
             }
             return mSession.write(SocketMessage.obtain(mGson.toJson(request))).isWritten();
@@ -122,7 +121,7 @@ public class SocketClientManager {
      * @param remoteAddr 远程地址
      */
     public void startSocketConnect(Context context, String remoteAddr) {
-        SocketClientService.startService(context, remoteAddr);
+        PosClientService.startService(context, remoteAddr);
     }
 
     /**
@@ -133,7 +132,7 @@ public class SocketClientManager {
      * @param remotePort 远程端口
      */
     public void startSocketConnect(Context context, String remoteAddr, int remotePort) {
-        SocketClientService.startService(context, remoteAddr, remotePort);
+        PosClientService.startService(context, remoteAddr, remotePort);
     }
 
     /**
@@ -142,8 +141,8 @@ public class SocketClientManager {
      * @param context Context
      * @param config  配置项
      */
-    public void startSocketConnect(Context context, SocketConfig config) {
-        SocketClientService.startService(context, config);
+    public void startSocketConnect(Context context, ConnectConfig config) {
+        PosClientService.startService(context, config);
     }
 
     /**
@@ -152,7 +151,7 @@ public class SocketClientManager {
      * @param context Context
      */
     public void stopSocketConnect(Context context) {
-        SocketClientService.stopService(context);
+        PosClientService.stopService(context);
     }
 
     /**

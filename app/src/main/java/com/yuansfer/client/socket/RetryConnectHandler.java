@@ -4,9 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.yuansfer.client.service.SocketClientService;
+import com.yuansfer.client.service.PosClientService;
 import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.future.ConnectFuture;
@@ -75,7 +74,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
             IoSession session = connectFuture.getSession();
             if (session.isConnected()) {
                 LogUtils.d("连接成功");
-                SocketClientManager.getInstance().saveSession(session);
+                PosClientManager.getInstance().saveSession(session);
                 //安全退出Looper线程
                 getLooper().quitSafely();
                 isThreadClosed = true;
@@ -111,7 +110,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
             postDelayed(this, RETRY_INTERVAL_MILLIS);
         } else {
             //关闭连接服务
-            SocketClientService.stopService(mContext);
+            PosClientService.stopService(mContext);
             LogUtils.d("连接失败，退出重连");
         }
     }

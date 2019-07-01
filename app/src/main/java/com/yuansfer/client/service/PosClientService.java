@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.yuansfer.client.socket.SocketClientConnector;
-import com.yuansfer.client.socket.SocketConfig;
+import com.yuansfer.client.socket.PosClientConnector;
+import com.yuansfer.client.socket.ConnectConfig;
 import com.yuansfer.client.netmonitor.NetChangeObserver;
 import com.yuansfer.client.netmonitor.NetMonitor;
 import com.yuansfer.client.util.LogUtils;
@@ -16,22 +16,22 @@ import com.yuansfer.client.util.LogUtils;
  * @CreateDate 2019/6/25 15:20
  * @Desciption Sokcet客户端Service
  */
-public class SocketClientService extends Service implements NetChangeObserver {
+public class PosClientService extends Service implements NetChangeObserver {
 
-    private static final String ACTION_SOCKET_SERVER_SERVICE = "com.android.service.action.SocketClientService";
-    private SocketClientConnector mSocketConnector;
+    private static final String ACTION_SOCKET_SERVER_SERVICE = "com.android.service.action.PosClientService";
+    private PosClientConnector mSocketConnector;
 
     public static void startService(Context context, String remoteAddr) {
-        startService(context, remoteAddr, SocketConfig.DEFAULT_PORT);
+        startService(context, remoteAddr, ConnectConfig.DEFAULT_PORT);
     }
 
     public static void startService(Context context, String remoteAddr, int remotePort) {
-        SocketConfig.SocketConfigBuilder builder = new SocketConfig.SocketConfigBuilder()
+        ConnectConfig.SocketConfigBuilder builder = new ConnectConfig.SocketConfigBuilder()
                 .setRemoteAddress(remoteAddr).setRemotePort(remotePort);
         startService(context, builder.build());
     }
 
-    public static void startService(Context context, SocketConfig config) {
+    public static void startService(Context context, ConnectConfig config) {
         Intent intent = new Intent(ACTION_SOCKET_SERVER_SERVICE);
         intent.setPackage(context.getPackageName());
         intent.putExtra("config", config);
@@ -59,8 +59,8 @@ public class SocketClientService extends Service implements NetChangeObserver {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && mSocketConnector == null) {
-            SocketConfig config = intent.getParcelableExtra("config");
-            mSocketConnector = new SocketClientConnector(this, config);
+            ConnectConfig config = intent.getParcelableExtra("config");
+            mSocketConnector = new PosClientConnector(this, config);
         }
         return Service.START_STICKY;
     }

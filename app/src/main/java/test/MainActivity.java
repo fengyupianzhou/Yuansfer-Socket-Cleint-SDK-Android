@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.PushAmountRequest;
 import com.yuansfer.client.business.response.BaseResponse;
-import com.yuansfer.client.socket.SocketClientManager;
+import com.yuansfer.client.socket.PosClientManager;
 import com.yuansfer.client.socket.listener.IResponseListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
@@ -33,14 +33,14 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientManager.getInstance().startSocketConnect(MainActivity.this,
+                PosClientManager.getInstance().startSocketConnect(MainActivity.this,
                         etIP.getText().toString(), Integer.parseInt(etPort.getText().toString()));
             }
         });
         findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientManager.getInstance().stopSocketConnect(MainActivity.this);
+                PosClientManager.getInstance().stopSocketConnect(MainActivity.this);
             }
         });
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 sendAndReceiveMsg();
             }
         });
-        SocketClientManager.getInstance().setOnSocketListener(new ISocketListener() {
+        PosClientManager.getInstance().setOnSocketListener(new ISocketListener() {
             @Override
             public void onSocketStart(IoService service) {
                 tvRet.setText("Socket服务已连接\n");
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 tvRet.setText("Socket服务已关闭\n");
             }
         });
-        SocketClientManager.getInstance().setOnSessionListener(new ISessionListener() {
+        PosClientManager.getInstance().setOnSessionListener(new ISessionListener() {
             @Override
             public void onSessionAdd(IoSession session) {
                 tvRet.append(String.format("Socket客户端已连接服务器%s\n", session.getRemoteAddress()));
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendAndReceiveMsg() {
-        SocketClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IResponseListener<BaseResponse>() {
+        PosClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IResponseListener<BaseResponse>() {
             @Override
             public void onSuccess(BaseResponse response) {
                 LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
