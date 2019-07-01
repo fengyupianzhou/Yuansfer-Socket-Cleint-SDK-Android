@@ -15,10 +15,6 @@ public class BaseSocketRequest {
         bizId = getBizId();
     }
 
-    public void setNeedResponse(boolean needResponse) {
-        this.needResponse = needResponse;
-    }
-
     public boolean isNeedResponse() {
         return needResponse;
     }

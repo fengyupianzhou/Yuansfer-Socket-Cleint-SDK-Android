@@ -14,6 +14,7 @@ public class PushAmountRequest extends BaseSocketRequest {
 
     public PushAmountRequest(double amount) {
         this.amount = amount;
+        this.needResponse = false;
     }
 
     public double getAmount() {
@@ -22,11 +23,6 @@ public class PushAmountRequest extends BaseSocketRequest {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    @Override
-    public boolean isNeedResponse() {
-        return false;
     }
 
     @Override
