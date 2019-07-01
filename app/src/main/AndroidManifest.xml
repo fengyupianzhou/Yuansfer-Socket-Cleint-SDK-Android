@@ -25,7 +25,7 @@
             android:name=".service.PosClientService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.android.service.action.SocketClientService" />
+                <action android:name="com.android.service.action.PosClientService" />
             </intent-filter>
         </service>
     </application>
