@@ -1,17 +1,20 @@
 package test;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.PushAmountRequest;
+import com.yuansfer.client.business.response.BaseResponse;
+import com.yuansfer.client.socket.SocketClientManager;
+import com.yuansfer.client.socket.listener.IResponseListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
-import com.yuansfer.client.R;
-import com.yuansfer.client.socket.SocketClientManager;
+import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SocketClientManager.getInstance().getInstance().sendMessage(new PushAmountRequest(0.01));
+                sendAndReceiveMsg();
             }
         });
         SocketClientManager.getInstance().setOnSocketListener(new ISocketListener() {
@@ -81,6 +84,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMessageReceive(IoSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端收到服务端发来的消息：%s\n", msg.toString()));
+            }
+        });
+    }
+
+    private void sendAndReceiveMsg() {
+        SocketClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IResponseListener<BaseResponse>() {
+            @Override
+            public void onSuccess(BaseResponse response) {
+                LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
+            }
+
+            @Override
+            public void onFail(String error) {
+
             }
         });
     }

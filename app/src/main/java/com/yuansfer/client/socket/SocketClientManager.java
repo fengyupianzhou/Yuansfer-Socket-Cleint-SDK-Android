@@ -1,9 +1,14 @@
 package com.yuansfer.client.socket;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.ArrayMap;
 
 import com.google.gson.Gson;
+import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.BaseRequest;
+import com.yuansfer.client.business.response.BaseResponse;
+import com.yuansfer.client.socket.listener.IResponseListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
 import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.socket.protocol.SocketMessage;
@@ -12,15 +17,26 @@ import com.yuansfer.client.service.SocketClientService;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+/**
+ * @Author Fly-Android
+ * @CreateDate 2019/7/1 12:04
+ * @Desciption Socket 连接及会话管理器
+ */
 public class SocketClientManager {
 
     private static SocketClientManager sInstance;
     private IoSession mSession;
     private ISocketListener mSocketListener;
     private ISessionListener mSessionListener;
-    private static final Gson GSON = new Gson();
+    private ArrayMap<String, IResponseListener> mRespListenerMap;
+    private Gson mGson;
 
     private SocketClientManager() {
+        mGson = new Gson();
+        mRespListenerMap = new ArrayMap<>();
     }
 
     public static SocketClientManager getInstance() {
@@ -46,14 +62,36 @@ public class SocketClientManager {
     /**
      * 发送消息
      *
-     * @param t
-     * @return
+     * @param request 请求消息
+     * @return 是否发送成功
      */
-    public <T extends BaseRequest> boolean sendMessage(T t) {
+    public <T extends BaseRequest> boolean sendMessage(T request) {
         if (isConnSuccess()) {
-            return mSession.write(SocketMessage.obtain(GSON.toJson(t))).isWritten();
+            return mSession.write(SocketMessage.obtain(mGson.toJson(request))).isWritten();
         } else {
-            mSessionListener.onMessageSendFail(SocketMessage.obtain(GSON.toJson(t)), "not found server session");
+            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(request)), "not found server session");
+            return false;
+        }
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param request  请求消息
+     * @param listener 响应回调
+     * @return 是否发送成功
+     */
+    public <T extends BaseRequest, R extends BaseResponse> boolean sendMessage(T request, IResponseListener<R> listener) {
+        if (isConnSuccess()) {
+            if (listener != null) {
+                mRespListenerMap.put(request.getRequestId(), listener);
+            }
+            return mSession.write(SocketMessage.obtain(mGson.toJson(request))).isWritten();
+        } else {
+            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(request)), "not found server session");
+            if (listener != null) {
+                listener.onFail("not found server session");
+            }
             return false;
         }
     }
@@ -77,26 +115,60 @@ public class SocketClientManager {
         }
     }
 
+    /**
+     * 启动连接
+     *
+     * @param context    Context
+     * @param remoteAddr 远程地址
+     */
     public void startSocketConnect(Context context, String remoteAddr) {
         SocketClientService.startService(context, remoteAddr);
     }
 
+    /**
+     * 启动连接
+     *
+     * @param context    Context
+     * @param remoteAddr 远程地址
+     * @param remotePort 远程端口
+     */
     public void startSocketConnect(Context context, String remoteAddr, int remotePort) {
         SocketClientService.startService(context, remoteAddr, remotePort);
     }
 
+    /**
+     * 启动连接
+     *
+     * @param context Context
+     * @param config  配置项
+     */
     public void startSocketConnect(Context context, SocketConfig config) {
         SocketClientService.startService(context, config);
     }
 
+    /**
+     * 停止连接
+     *
+     * @param context Context
+     */
     public void stopSocketConnect(Context context) {
         SocketClientService.stopService(context);
     }
 
+    /**
+     * 监听Socket连接状态
+     *
+     * @param socketListener
+     */
     public void setOnSocketListener(ISocketListener socketListener) {
         this.mSocketListener = socketListener;
     }
 
+    /**
+     * 监听会话状态
+     *
+     * @param sessionListener
+     */
     public void setOnSessionListener(ISessionListener sessionListener) {
         this.mSessionListener = sessionListener;
     }
@@ -137,9 +209,45 @@ public class SocketClientManager {
     }
 
     void notifySessionMessageReceive(IoSession session, Object message) {
+        IResponseListener responseListener = null;
         if (mSessionListener != null) {
             mSessionListener.onMessageReceive(session, message);
         }
+        try {
+            if (message instanceof SocketMessage) {
+                SocketMessage socketMsg = (SocketMessage) message;
+                BaseResponse response = mGson.fromJson(socketMsg.getContent(), BaseResponse.class);
+                responseListener = mRespListenerMap.remove(response.getRequestId());
+                if (responseListener != null) {
+                    if (response.getRet() == BaseResponse.SUCCESS) {
+                        responseListener.onSuccess(mGson.fromJson(socketMsg.getContent(), genGenericInstance(responseListener.getClass())));
+                    } else {
+                        responseListener.onFail(response.getMsg());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (responseListener != null) {
+                responseListener.onFail(e.getMessage());
+            }
+            e.printStackTrace();
+        }
+    }
+
+    <V extends BaseResponse> Class<V> genGenericInstance(Class clazz) throws ClassNotFoundException {
+        Class<V> response;
+        final Type[] types = clazz.getGenericInterfaces();
+        if (types == null || types.length == 0 || !(types[0] instanceof ParameterizedType)) {
+            return null;
+        }
+        final ParameterizedType type = (ParameterizedType) types[0];
+        final String actArgs = type.getActualTypeArguments()[0].toString();
+        if (actArgs.startsWith("class ")) {
+            response = (Class<V>) Class.forName(actArgs.substring("class ".length()));
+        } else {
+            response = (Class<V>) Class.forName(actArgs);
+        }
+        return response;
     }
 
 }

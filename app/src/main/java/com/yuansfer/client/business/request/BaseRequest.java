@@ -1,27 +1,28 @@
 package com.yuansfer.client.business.request;
 
+import java.util.UUID;
+
 /**
  * @Author Fly-Android
  * @CreateDate 2019/6/27 16:32
  * @Desciption socket业务请求
  */
-public class BaseRequest {
+public abstract class BaseRequest {
 
+    protected String requestId = UUID.randomUUID().toString();
+    protected String bizId = getBizId();
     //请求是否需要响应
     protected boolean needResponse = true;
-    protected String bizId;
 
-    public BaseRequest() {
-        bizId = getBizId();
+    public final String getRequestId() {
+        return requestId;
     }
 
-    public boolean isNeedResponse() {
-        return needResponse;
-    }
-
-    //业务ID号,类似请求地址
-    public String getBizId() {
-        return null;
-    }
+    /**
+     * 业务标识，类似接口名称
+     *
+     * @return
+     */
+    public abstract String getBizId();
 
 }

@@ -18,7 +18,7 @@ import java.net.InetSocketAddress;
 /**
  * @Author Fly-Android
  * @CreateDate 2019/6/25 15:19
- * @Desciption 连接处理器
+ * @Desciption Socket重连处理器
  */
 public class RetryConnectHandler extends Handler implements Runnable {
 

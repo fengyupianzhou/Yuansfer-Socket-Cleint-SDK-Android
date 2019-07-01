@@ -7,17 +7,29 @@ package com.yuansfer.client.business.response;
  */
 public class BaseResponse {
 
+    public static final int SUCCESS = 0;
+    public static final int ERROR = -1;
     //业务接口是否成功
-    protected boolean isSuccess;
-    //响应提示
-    protected String msg;
+    protected int ret = SUCCESS;
+    //提示
+    protected String msg = "success";
+    //请求标识
+    protected String requestId;
 
-    public boolean isSuccess() {
-        return isSuccess;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setSuccess(boolean success) {
-        isSuccess = success;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public int getRet() {
+        return ret;
+    }
+
+    public void setRet(int ret) {
+        this.ret = ret;
     }
 
     public String getMsg() {
