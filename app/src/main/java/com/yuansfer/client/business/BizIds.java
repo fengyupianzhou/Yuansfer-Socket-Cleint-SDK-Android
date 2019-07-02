@@ -7,5 +7,8 @@ package com.yuansfer.client.business;
  */
 public enum BizIds {
 
-    ShowMessage, PushAmount
+    //显示消息
+    ShowMessage,
+    //推送金额
+    PushAmount
 }
