@@ -11,12 +11,11 @@ import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.PushAmountRequest;
 import com.yuansfer.client.business.response.BaseResponse;
 import com.yuansfer.client.socket.PosClientManager;
-import com.yuansfer.client.socket.listener.IResponseListener;
+import com.yuansfer.client.socket.listener.IConnectStateListener;
+import com.yuansfer.client.socket.listener.IMsgReplyListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
-import com.yuansfer.client.socket.listener.ISocketListener;
 import com.yuansfer.client.util.LogUtils;
 
-import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,14 +32,14 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PosClientManager.getInstance().startSocketConnect(MainActivity.this,
+                PosClientManager.getInstance().startDeviceConnect(MainActivity.this,
                         etIP.getText().toString(), Integer.parseInt(etPort.getText().toString()));
             }
         });
         findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PosClientManager.getInstance().stopSocketConnect(MainActivity.this);
+                PosClientManager.getInstance().stopDeviceConnect(MainActivity.this);
             }
         });
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
@@ -49,14 +48,20 @@ public class MainActivity extends AppCompatActivity {
                 sendAndReceiveMsg();
             }
         });
-        PosClientManager.getInstance().setOnSocketListener(new ISocketListener() {
+        findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSocketStart(IoService service) {
+            public void onClick(View v) {
+                PosClientManager.getInstance().showMessage("Welcome Yuansfer POS device");
+            }
+        });
+        PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
+            @Override
+            public void onDeviceConnected() {
                 tvRet.setText("Socket服务已连接\n");
             }
 
             @Override
-            public void onSocketStop(IoService service) {
+            public void onDeviceDisconnected() {
                 tvRet.setText("Socket服务已关闭\n");
             }
         });
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendAndReceiveMsg() {
-        PosClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IResponseListener<BaseResponse>() {
+        PosClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IMsgReplyListener<BaseResponse>() {
             @Override
             public void onSuccess(BaseResponse response) {
                 LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");

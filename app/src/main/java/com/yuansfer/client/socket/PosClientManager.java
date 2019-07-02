@@ -5,14 +5,14 @@ import android.util.ArrayMap;
 
 import com.google.gson.Gson;
 import com.yuansfer.client.business.request.BaseRequest;
+import com.yuansfer.client.business.request.ShowMessageRequest;
 import com.yuansfer.client.business.response.BaseResponse;
-import com.yuansfer.client.socket.listener.IResponseListener;
+import com.yuansfer.client.socket.listener.IMsgReplyListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
-import com.yuansfer.client.socket.listener.ISocketListener;
+import com.yuansfer.client.socket.listener.IConnectStateListener;
 import com.yuansfer.client.socket.protocol.SocketMessage;
 import com.yuansfer.client.service.PosClientService;
 
-import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 
 import java.lang.reflect.ParameterizedType;
@@ -26,10 +26,10 @@ import java.lang.reflect.Type;
 public class PosClientManager {
 
     private static PosClientManager sInstance;
-    private IoSession mSession;
-    private ISocketListener mSocketListener;
+    private IConnectStateListener mConnectStateListener;
     private ISessionListener mSessionListener;
-    private ArrayMap<String, IResponseListener> mRespListenerMap;
+    private IoSession mSession;
+    private ArrayMap<String, IMsgReplyListener> mRespListenerMap;
     private Gson mGson;
 
     private PosClientManager() {
@@ -58,6 +58,21 @@ public class PosClientManager {
     }
 
     /**
+     * 在server设备上显示消息
+     *
+     * @param message 消息内容
+     * @return 是否发送成功
+     */
+    public boolean showMessage(String message) {
+        if (isConnSuccess()) {
+            return mSession.write(SocketMessage.obtain(mGson.toJson(new ShowMessageRequest(message)))).isWritten();
+        } else {
+            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(new ShowMessageRequest(message))), "not found server session");
+            return false;
+        }
+    }
+
+    /**
      * 发送消息
      *
      * @param request 请求消息
@@ -79,7 +94,7 @@ public class PosClientManager {
      * @param listener 响应回调
      * @return 是否发送成功
      */
-    public <T extends BaseRequest, R extends BaseResponse> boolean sendMessage(T request, IResponseListener<R> listener) {
+    public <T extends BaseRequest, R extends BaseResponse> boolean sendMessage(T request, IMsgReplyListener<R> listener) {
         if (isConnSuccess()) {
             if (listener != null && request.isNeedResponse()) {
                 //需要server反馈时加入回调集合
@@ -100,8 +115,10 @@ public class PosClientManager {
      *
      * @param session
      */
-    public void saveSession(IoSession session) {
-        mSession = session;
+    void saveSession(IoSession session) {
+        if (session != null) {
+            mSession = session;
+        }
     }
 
     /**
@@ -120,7 +137,7 @@ public class PosClientManager {
      * @param context    Context
      * @param remoteAddr 远程地址
      */
-    public void startSocketConnect(Context context, String remoteAddr) {
+    public void startDeviceConnect(Context context, String remoteAddr) {
         PosClientService.startService(context, remoteAddr);
     }
 
@@ -131,7 +148,7 @@ public class PosClientManager {
      * @param remoteAddr 远程地址
      * @param remotePort 远程端口
      */
-    public void startSocketConnect(Context context, String remoteAddr, int remotePort) {
+    public void startDeviceConnect(Context context, String remoteAddr, int remotePort) {
         PosClientService.startService(context, remoteAddr, remotePort);
     }
 
@@ -141,7 +158,7 @@ public class PosClientManager {
      * @param context Context
      * @param config  配置项
      */
-    public void startSocketConnect(Context context, ConnectConfig config) {
+    public void startDeviceConnect(Context context, ConnectConfig config) {
         PosClientService.startService(context, config);
     }
 
@@ -150,38 +167,38 @@ public class PosClientManager {
      *
      * @param context Context
      */
-    public void stopSocketConnect(Context context) {
+    public void stopDeviceConnect(Context context) {
         PosClientService.stopService(context);
     }
 
     /**
      * 监听Socket连接状态
      *
-     * @param socketListener
+     * @param listener 监听器
      */
-    public void setOnSocketListener(ISocketListener socketListener) {
-        this.mSocketListener = socketListener;
+    public void setOnConnectStateListener(IConnectStateListener listener) {
+        this.mConnectStateListener = listener;
     }
 
     /**
      * 监听会话状态
      *
-     * @param sessionListener
+     * @param sessionListener 监听器
      */
     public void setOnSessionListener(ISessionListener sessionListener) {
         this.mSessionListener = sessionListener;
     }
 
-    void notifySocketCreated(IoService service) {
-        if (mSocketListener != null) {
-            mSocketListener.onSocketStart(service);
+    void notifySocketCreated() {
+        if (mConnectStateListener != null) {
+            mConnectStateListener.onDeviceConnected();
         }
     }
 
-    void notifySocketDestroyed(IoService service) {
+    void notifySocketDestroyed() {
         mSession = null;
-        if (mSocketListener != null) {
-            mSocketListener.onSocketStop(service);
+        if (mConnectStateListener != null) {
+            mConnectStateListener.onDeviceDisconnected();
         }
     }
 
@@ -208,7 +225,7 @@ public class PosClientManager {
     }
 
     void notifySessionMessageReceive(IoSession session, Object message) {
-        IResponseListener responseListener = null;
+        IMsgReplyListener responseListener = null;
         if (mSessionListener != null) {
             mSessionListener.onMessageReceive(session, message);
         }

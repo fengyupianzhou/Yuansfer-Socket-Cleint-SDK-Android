@@ -7,5 +7,5 @@ package com.yuansfer.client.business;
  */
 public enum BizIds {
 
-    PushAmount
+    ShowMessage, PushAmount
 }

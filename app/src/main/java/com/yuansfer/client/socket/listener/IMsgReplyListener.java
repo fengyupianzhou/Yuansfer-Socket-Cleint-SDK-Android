@@ -7,7 +7,7 @@ import com.yuansfer.client.business.response.BaseResponse;
  * @CreateDate 2019/7/1 12:10
  * @Desciption 请求响应监听器
  */
-public interface IResponseListener<R extends BaseResponse> {
+public interface IMsgReplyListener<R extends BaseResponse> {
 
     /**
      * 响应成功

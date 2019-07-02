@@ -42,10 +42,10 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SOCKET_CONN_OPEN_WHAT:
-                    PosClientManager.getInstance().notifySocketCreated((IoService) msg.obj);
+                    PosClientManager.getInstance().notifySocketCreated();
                     break;
                 case SOCKET_CONN_CLOSE_WHAT:
-                    PosClientManager.getInstance().notifySocketDestroyed((IoService) msg.obj);
+                    PosClientManager.getInstance().notifySocketDestroyed();
                     break;
                 case SESSION_ADD_WHAT:
                     PosClientManager.getInstance().notifySessionCreated(((SessionMsgObj) msg.obj).session);
@@ -144,7 +144,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
     @Override
     public void serviceActivated(IoService ioService) throws Exception {
         LogUtils.d("serviceActivated");
-        sHandler.obtainMessage(SOCKET_CONN_OPEN_WHAT, ioService).sendToTarget();
+        sHandler.sendEmptyMessage(SOCKET_CONN_OPEN_WHAT);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
     @Override
     public void serviceDeactivated(IoService ioService) throws Exception {
         LogUtils.d("serviceDeactivated");
-        sHandler.obtainMessage(SOCKET_CONN_CLOSE_WHAT, ioService).sendToTarget();
+        sHandler.sendEmptyMessage(SOCKET_CONN_CLOSE_WHAT);
         if (!ioService.isDisposed()) {
             //非主动关闭连接断开后再次连接
             startConnection();
