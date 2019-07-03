@@ -11,6 +11,7 @@ import com.yuansfer.client.R;
 import com.yuansfer.client.business.request.PushAmountRequest;
 import com.yuansfer.client.business.response.BaseResponse;
 import com.yuansfer.client.socket.PosClientManager;
+import com.yuansfer.client.socket.listener.AbstractMsgReceivedListener;
 import com.yuansfer.client.socket.listener.IConnectStateListener;
 import com.yuansfer.client.socket.listener.IMsgReplyListener;
 import com.yuansfer.client.socket.listener.ISessionListener;
@@ -95,6 +96,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMessageReceive(IoSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端收到服务端发来的消息：%s\n", msg.toString()));
+            }
+        });
+        PosClientManager.getInstance().setOnSessionListener(new AbstractMsgReceivedListener() {
+            @Override
+            public void onMessageReceive(IoSession session, Object msg) {
+
             }
         });
     }
