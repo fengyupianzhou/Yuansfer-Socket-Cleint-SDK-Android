@@ -39,7 +39,12 @@
         android:layout_height="wrap_content"
         android:text="发起0.01$的金额推送"
         android:textAllCaps="false" />
-
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发起0.02$的金额推送"
+        android:textAllCaps="false" />
     <Button
         android:id="@+id/btn4"
         android:layout_width="wrap_content"

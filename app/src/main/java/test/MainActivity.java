@@ -45,7 +45,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendAndReceiveMsg();
+                pushAmount(0.01);
+            }
+        });
+        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pushAmount(0.02);
             }
         });
         findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener() {
@@ -93,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void sendAndReceiveMsg() {
-        PosClientManager.getInstance().sendMessage(new PushAmountRequest(0.01), new IMsgReplyListener<BaseResponse>() {
+    private void pushAmount(double amount) {
+        PosClientManager.getInstance().sendMessage(new PushAmountRequest(amount), new IMsgReplyListener<BaseResponse>() {
             @Override
             public void onSuccess(BaseResponse response) {
                 LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
