@@ -1,37 +1,107 @@
-# Yuansfer-Socket-Client-SDK-Android
+## Yuansfer-Socket-Client-SDK-Android
+Yuansfer-Socket-Client-SDK-Android是使用socket通信方式与Yuansfer的POS设备进行点对点通信的Android Libary
 
-#### 介绍
-基于mina的socket client sdk
+### 快速接入
+* 完整版,已依赖支付平台SDK
+```
+dependencies {
+    ...
+    compile 'com.yuansfer.sdk:socket-client:0.1.0'
+}
+```
 
-#### 软件架构
-软件架构说明
+### 使用方式
+1. 在AndroidManifest.xml文件中声明权限和Service组件
+```
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
 
+<service
+    android:name="com.yuansfer.client.service.PosClientService"
+    android:exported="false">
+            <intent-filter>
+                <action android:name="com.android.service.action.PosClientService" />
+            </intent-filter>
+ </service>
+```
+2. 监听连接状态，可监听连接成功或断开连接
+```
+PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
+            @Override
+            public void onDeviceConnected() {
 
-#### 安装教程
+            }
 
-1. xxxx
-2. xxxx
-3. xxxx
+            @Override
+            public void onDeviceDisconnected() {
 
-#### 使用说明
+            }
+        });
 
-1. xxxx
-2. xxxx
-3. xxxx
+```
+3. 监听会话状态或消息发送接收(未处理解析)，包含json内容，只监听消息到达传入AbstractMsgReceivedListener类实现
+```
+PosClientManager.getInstance().setOnSessionListener(new ISessionListener() {
+    @Override
+    public void onSessionAdd(PIOSession session) {
 
-#### 参与贡献
+    }
 
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+    @Override
+    public void onSessionRemove(PIOSession session) {
 
+    }
 
-#### 码云特技
+    @Override
+    public void onMessageSent(PIOSession session, Object msg) {
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+    }
+
+    @Override
+    public void onMessageSendFail(Object msg, String reason) {
+
+    }
+
+    @Override
+    public void onMessageReceive(PIOSession session, Object msg) {
+
+    }
+});
+
+```
+4. 发起连接
+```
+PosClientManager.getInstance().startDeviceConnect（Context context, String ip,  int port）
+```
+5. 向POS N5设备发起显示文本消息，可测试是否连接成功
+```
+ PosClientManager.getInstance().showMessage("Welcome Yuansfer POS device");
+```
+6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如推送金额到POS N5设备
+```
+PosClientManager.getInstance().sendMessage(new PushAmountRequest(amount), new IMsgReplyListener<BaseResponse>() {
+             @Override
+             public void onSuccess(BaseResponse response) {
+                 LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
+             }
+
+             @Override
+             public void onFail(String error) {
+
+             }
+         });
+
+```
+7. 断开连接
+```
+PosClientManager.getInstance().stopDeviceConnect(Context context)
+```
+
+### 其它说明
+* 无
+
+### 版本日志
+
+#### 0.1.0
+- 项目初始化
+- 初步实现socket间的长连接通信

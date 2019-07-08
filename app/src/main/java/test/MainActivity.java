@@ -7,17 +7,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.yuansfer.client.R;
+import com.yuansfer.app.R;
 import com.yuansfer.client.business.request.PushAmountRequest;
 import com.yuansfer.client.business.response.BaseResponse;
-import com.yuansfer.client.socket.PosClientManager;
-import com.yuansfer.client.socket.listener.AbstractMsgReceivedListener;
-import com.yuansfer.client.socket.listener.IConnectStateListener;
-import com.yuansfer.client.socket.listener.IMsgReplyListener;
-import com.yuansfer.client.socket.listener.ISessionListener;
+import com.yuansfer.client.connect.PosClientManager;
+import com.yuansfer.client.connect.PIOSession;
+import com.yuansfer.client.listener.AbstractMsgReceivedListener;
+import com.yuansfer.client.listener.IConnectStateListener;
+import com.yuansfer.client.listener.IMsgReplyListener;
+import com.yuansfer.client.listener.ISessionListener;
 import com.yuansfer.client.util.LogUtils;
 
-import org.apache.mina.core.session.IoSession;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvRet;
@@ -72,19 +72,20 @@ public class MainActivity extends AppCompatActivity {
                 tvRet.setText("Socket服务已关闭\n");
             }
         });
+
         PosClientManager.getInstance().setOnSessionListener(new ISessionListener() {
             @Override
-            public void onSessionAdd(IoSession session) {
+            public void onSessionAdd(PIOSession session) {
                 tvRet.append(String.format("Socket客户端已连接服务器%s\n", session.getRemoteAddress()));
             }
 
             @Override
-            public void onSessionRemove(IoSession session) {
+            public void onSessionRemove(PIOSession session) {
                 tvRet.append(String.format("Socket客户端已退出服务器%s\n", session.getRemoteAddress()));
             }
 
             @Override
-            public void onMessageSent(IoSession session, Object msg) {
+            public void onMessageSent(PIOSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端发送了消息：%s\n", msg.toString()));
             }
 
@@ -94,13 +95,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onMessageReceive(IoSession session, Object msg) {
+            public void onMessageReceive(PIOSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端收到服务端发来的消息：%s\n", msg.toString()));
             }
         });
         PosClientManager.getInstance().setOnSessionListener(new AbstractMsgReceivedListener() {
             @Override
-            public void onMessageReceive(IoSession session, Object msg) {
+            public void onMessageReceive(PIOSession session, Object msg) {
 
             }
         });
