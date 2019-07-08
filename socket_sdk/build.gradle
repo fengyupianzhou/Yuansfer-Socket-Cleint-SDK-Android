@@ -34,7 +34,7 @@ publish {
     artifactId = "socket-client"
     publishVersion = '0.1.0'
     desc = 'socket client'
-    website = 'https://github.com/fengyupianzhou/Yuansfer-Mobile-Pay-SDK-Android-V2'
+    website = 'https://github.com/fengyupianzhou/Yuansfer-Socket-Client-SDK-Android'
 }
 
 tasks.withType(org.gradle.api.tasks.javadoc.Javadoc) {
