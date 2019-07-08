@@ -7,6 +7,7 @@
 
 package com.yuansfer.client.netmonitor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,6 +28,7 @@ class NetworkUtils {
         ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (cm != null) {
+            @SuppressLint("MissingPermission")
             NetworkInfo info = cm.getActiveNetworkInfo();
             if (null != info && info.isConnected()) {
                 return info.getState() == NetworkInfo.State.CONNECTED;
@@ -38,10 +40,12 @@ class NetworkUtils {
 
     /**
      * 获取当前的网络状态 ：没有网络-0：WIFI网络1：4G网络-4：3G网络-3：2G网络-2*
+     *
      * @param context
      * @return
      */
-    public static @NetworkType String getNetworkType(Context context) {
+    public static @NetworkType
+    String getNetworkType(Context context) {
         //结果返回值
         String netType = NetworkType.UNKNOWN;
         //获取手机所有连接管理对象
@@ -52,6 +56,7 @@ class NetworkUtils {
         }
 
         //获取NetworkInfo对象
+        @SuppressLint("MissingPermission")
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         //NetworkInfo对象为空 则代表没有网络
         if (networkInfo == null || !networkInfo.isAvailable()) {
@@ -71,7 +76,7 @@ class NetworkUtils {
 
     private static String getMobileNetWorkType(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        switch (telephonyManager.getNetworkType()){
+        switch (telephonyManager.getNetworkType()) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_EDGE:
             case TelephonyManager.NETWORK_TYPE_CDMA:
