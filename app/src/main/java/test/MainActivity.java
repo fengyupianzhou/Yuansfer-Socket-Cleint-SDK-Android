@@ -8,15 +8,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.yuansfer.app.R;
-import com.yuansfer.client.business.request.PushAmountRequest;
-import com.yuansfer.client.business.response.BaseResponse;
+import com.yuansfer.client.business.request.PreOrderPosRequest;
+import com.yuansfer.client.business.response.PreOrderPosResponse;
 import com.yuansfer.client.connect.PosClientManager;
 import com.yuansfer.client.connect.PIOSession;
 import com.yuansfer.client.listener.AbstractMsgReceivedListener;
 import com.yuansfer.client.listener.IConnectStateListener;
 import com.yuansfer.client.listener.IMsgReplyListener;
 import com.yuansfer.client.listener.ISessionListener;
-import com.yuansfer.client.util.LogUtils;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,19 +45,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pushAmount(0.01);
+                preOrder(0.01);
             }
         });
         findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pushAmount(0.02);
+                preOrder(0.02);
             }
         });
         findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PosClientManager.getInstance().showMessage("Welcome Yuansfer POS device");
+                PosClientManager.getInstance().showMessage("show message on yuansfer pos terminal");
             }
         });
         PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
@@ -107,18 +106,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void pushAmount(double amount) {
-        PosClientManager.getInstance().sendMessage(new PushAmountRequest(amount), new IMsgReplyListener<BaseResponse>() {
-            @Override
-            public void onSuccess(BaseResponse response) {
-                LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
-            }
+    private void preOrder(double amount) {
+        PosClientManager.getInstance().sendMessage(new PreOrderPosRequest(null, amount)
+                , new IMsgReplyListener<PreOrderPosResponse>() {
+                    @Override
+                    public void onSuccess(PreOrderPosResponse response) {
+                        tvRet.append("支付成功，订单号：" + response.getTransactionNo() + "\n");
+                    }
 
-            @Override
-            public void onFail(String error) {
-
-            }
-        });
+                    @Override
+                    public void onFail(int errCode, String errMsg) {
+                        tvRet.append("支付失败：" + errMsg + "\n");
+                    }
+                });
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.yuansfer.client.listener.IConnectStateListener;
 import com.yuansfer.client.listener.IMsgReplyListener;
 import com.yuansfer.client.listener.ISessionListener;
 import com.yuansfer.client.protocol.SocketMessage;
+import com.yuansfer.client.util.ResultCode;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -104,7 +105,7 @@ public class PosClientManager {
         } else {
             mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(request)), "not found server session");
             if (listener != null) {
-                listener.onFail("not found server session");
+                listener.onFail(ResultCode.SESSION_CLOSED, "not found server session");
             }
             return false;
         }
@@ -239,16 +240,16 @@ public class PosClientManager {
                 BaseResponse response = mGson.fromJson(socketMsg.getContent(), BaseResponse.class);
                 responseListener = mRespListenerMap.remove(response.getRequestId());
                 if (responseListener != null) {
-                    if (response.getRet() == BaseResponse.SUCCESS) {
+                    if (response.getRetCode() == ResultCode.REQUEST_SUCCESS) {
                         responseListener.onSuccess(mGson.fromJson(socketMsg.getContent(), genGenericInstance(responseListener.getClass())));
                     } else {
-                        responseListener.onFail(response.getMsg());
+                        responseListener.onFail(response.getRetCode(), response.getRetMsg());
                     }
                 }
             }
         } catch (Exception e) {
             if (responseListener != null) {
-                responseListener.onFail(e.getMessage());
+                responseListener.onFail(ResultCode.PARSE_ERROR, e.getMessage());
             }
             e.printStackTrace();
         }

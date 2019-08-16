@@ -75,7 +75,7 @@ PosClientManager.getInstance().startDeviceConnect（Context context, String ip, 
 ```
 5. 向POS N5设备发起显示文本消息，可测试是否连接成功
 ```
- PosClientManager.getInstance().showMessage("Welcome Yuansfer POS device");
+ PosClientManager.getInstance().showMessage("show message on yuansfer pos terminal");
 ```
 6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如推送金额到POS N5设备
 ```

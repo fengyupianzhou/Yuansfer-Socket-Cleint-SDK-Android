@@ -1,5 +1,7 @@
 package com.yuansfer.client.business.response;
 
+import com.yuansfer.client.util.ResultCode;
+
 /**
  * @Author Fly-Android
  * @CreateDate 2019/6/27 16:29
@@ -7,14 +9,24 @@ package com.yuansfer.client.business.response;
  */
 public class BaseResponse {
 
-    public static final int SUCCESS = 0;
-    public static final int ERROR = -1;
-    //业务接口是否成功
-    protected int ret = SUCCESS;
-    //提示
-    protected String msg = "success";
+    //状态码
+    protected int retCode;
+    //状态信息
+    protected String retMsg = "success";
     //请求标识
     protected String requestId;
+
+    public BaseResponse(String requestId) {
+        this(requestId, ResultCode.REQUEST_SUCCESS, null);
+    }
+
+    public BaseResponse(String requestId, int ret, String msg) {
+        this.retCode = ret;
+        this.requestId = requestId;
+        if (msg != null) {
+            this.retMsg = msg;
+        }
+    }
 
     public String getRequestId() {
         return requestId;
@@ -24,19 +36,19 @@ public class BaseResponse {
         this.requestId = requestId;
     }
 
-    public int getRet() {
-        return ret;
+    public int getRetCode() {
+        return retCode;
     }
 
-    public void setRet(int ret) {
-        this.ret = ret;
+    public void setRetCode(int retCode) {
+        this.retCode = retCode;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getRetMsg() {
+        return retMsg;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setRetMsg(String retMsg) {
+        this.retMsg = retMsg;
     }
 }

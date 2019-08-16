@@ -9,6 +9,6 @@ public enum BizIds {
 
     //显示消息
     ShowMessage,
-    //推送金额
-    PushAmount
+    //预付款订单
+    PreOrderPos
 }

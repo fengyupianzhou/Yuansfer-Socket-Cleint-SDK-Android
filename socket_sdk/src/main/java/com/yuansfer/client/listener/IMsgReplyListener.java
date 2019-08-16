@@ -19,7 +19,8 @@ public interface IMsgReplyListener<R extends BaseResponse> {
     /**
      * 响应失败
      *
-     * @param error 失败原由
+     * @param errorCode 错误码
+     * @param errorMsg  失败原由
      */
-    void onFail(String error);
+    void onFail(int errorCode, String errorMsg);
 }
