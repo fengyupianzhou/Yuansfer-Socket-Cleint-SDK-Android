@@ -77,19 +77,20 @@ PosClientManager.getInstance().startDeviceConnect（Context context, String ip, 
 ```
  PosClientManager.getInstance().showMessage("show message on yuansfer pos terminal");
 ```
-6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如推送金额到POS N5设备
+6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如发起预下单到POS N5设备
 ```
-PosClientManager.getInstance().sendMessage(new PushAmountRequest(amount), new IMsgReplyListener<BaseResponse>() {
-             @Override
-             public void onSuccess(BaseResponse response) {
-                 LogUtils.d("这里没有调用是因为PushAmountRequest不需要反馈");
-             }
+PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("32", amount)
+                , new IMsgReplyListener<PreOrderPosResponse>() {
+                    @Override
+                    public void onSuccess(PreOrderPosResponse response) {
+                        tvRet.append("支付成功，订单号：" + response.getTransactionNo() + "\n");
+                    }
 
-             @Override
-             public void onFail(String error) {
-
-             }
-         });
+                    @Override
+                    public void onFail(int errCode, String errMsg) {
+                        tvRet.append("支付失败：" + errMsg + "\n");
+                    }
+                });
 
 ```
 7. 断开连接
@@ -105,3 +106,6 @@ PosClientManager.getInstance().stopDeviceConnect(Context context)
 #### 0.1.0
 - 项目初始化
 - 初步实现socket间的长连接通信
+
+#### 0.1.2
+- 预下单支付，响应支付成功失败
