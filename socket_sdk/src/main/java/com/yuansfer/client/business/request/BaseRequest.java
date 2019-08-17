@@ -9,7 +9,10 @@ import java.util.UUID;
  */
 public abstract class BaseRequest {
 
+    //请求标识
     protected String requestId = UUID.randomUUID().toString();
+    //业务id
+    protected String bizId = getBizId();
     //请求是否需要响应
     protected boolean needResponse = true;
 
