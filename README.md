@@ -108,4 +108,4 @@ PosClientManager.getInstance().stopDeviceConnect(Context context)
 - 初步实现socket间的长连接通信
 
 #### 0.1.3
-- 预下单支付，响应支付成功失败
+- 预下单支付，响应支付成功/失败
