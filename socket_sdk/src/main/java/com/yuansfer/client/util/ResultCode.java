@@ -28,6 +28,10 @@ public class ResultCode {
      */
     public static final int PARSE_ERROR = -4;
     /**
+     * 用户取消
+     */
+    public static final int USER_CANCELLED = -5;
+    /**
      * 未知错误
      */
     public static final int UNKNOWN_ERROR = -8;
