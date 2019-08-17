@@ -6,7 +6,7 @@ Yuansfer-Socket-Client-SDK-Android是使用socket通信方式与Yuansfer的POS�
 ```
 dependencies {
     ...
-    compile 'com.yuansfer.sdk:socket-client:0.1.0'
+    compile 'com.yuansfer.sdk:socket-client:0.1.2'
 }
 ```
 
@@ -79,7 +79,7 @@ PosClientManager.getInstance().startDeviceConnect（Context context, String ip, 
 ```
 6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如发起预下单到POS N5设备
 ```
-PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("32", amount)
+PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("商户流水号", amount)
                 , new IMsgReplyListener<PreOrderPosResponse>() {
                     @Override
                     public void onSuccess(PreOrderPosResponse response) {

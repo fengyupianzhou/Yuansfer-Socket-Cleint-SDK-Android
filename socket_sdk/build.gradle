@@ -37,7 +37,7 @@ publish {
     userOrg = 'fly-zhu189'
     groupId = 'com.yuansfer.sdk'
     artifactId = "socket-client"
-    publishVersion = '0.1.0'
+    publishVersion = '0.1.2'
     desc = 'socket client'
     website = 'https://github.com/fengyupianzhou/Yuansfer-Socket-Client-SDK-Android'
 }
