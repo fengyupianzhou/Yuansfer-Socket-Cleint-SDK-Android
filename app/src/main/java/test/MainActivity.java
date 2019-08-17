@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void preOrder(double amount) {
-        PosClientManager.getInstance().sendMessage(new PreOrderPosRequest(null, amount)
+        PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("32", amount)
                 , new IMsgReplyListener<PreOrderPosResponse>() {
                     @Override
                     public void onSuccess(PreOrderPosResponse response) {
