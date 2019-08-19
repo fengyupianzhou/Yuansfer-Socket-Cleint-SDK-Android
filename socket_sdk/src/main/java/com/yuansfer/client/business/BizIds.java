@@ -10,5 +10,5 @@ public enum BizIds {
     //显示消息
     ShowMessage,
     //预付款订单
-    PreOrderPos
+    OrderPay
 }

@@ -8,8 +8,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.yuansfer.app.R;
-import com.yuansfer.client.business.request.PreOrderPosRequest;
-import com.yuansfer.client.business.response.PreOrderPosResponse;
+import com.yuansfer.client.business.request.OrderPayRequest;
+import com.yuansfer.client.business.response.OrderPayResponse;
 import com.yuansfer.client.connect.PosClientManager;
 import com.yuansfer.client.connect.PIOSession;
 import com.yuansfer.client.listener.AbstractMsgReceivedListener;
@@ -107,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void preOrder(double amount) {
-        PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("32", amount)
-                , new IMsgReplyListener<PreOrderPosResponse>() {
+        PosClientManager.getInstance().sendMessage(new OrderPayRequest("32", amount)
+                , new IMsgReplyListener<OrderPayResponse>() {
                     @Override
-                    public void onSuccess(PreOrderPosResponse response) {
-                        tvRet.append("支付成功，订单号：" + response.getTransactionNo() + "\n");
+                    public void onSuccess(OrderPayResponse response) {
+                        tvRet.append("支付成功，交易结果：" + response + "\n");
                     }
 
                     @Override

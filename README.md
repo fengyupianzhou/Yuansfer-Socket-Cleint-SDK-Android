@@ -79,10 +79,10 @@ PosClientManager.getInstance().startDeviceConnect（Context context, String ip, 
 ```
 6. 向POS N5 发起请求/响应消息，请求对象包含是否需要返回标志位，比如发起预下单到POS N5设备
 ```
-PosClientManager.getInstance().sendMessage(new PreOrderPosRequest("商户流水号", amount)
-                , new IMsgReplyListener<PreOrderPosResponse>() {
+PosClientManager.getInstance().sendMessage(new OrderPayRequest("商户流水号", amount)
+                , new IMsgReplyListener<OrderPayResponse>() {
                     @Override
-                    public void onSuccess(PreOrderPosResponse response) {
+                    public void onSuccess(OrderPayResponse response) {
                         tvRet.append("支付成功，订单号：" + response.getTransactionNo() + "\n");
                     }
 

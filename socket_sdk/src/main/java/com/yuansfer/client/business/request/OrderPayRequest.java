@@ -8,12 +8,12 @@ import com.yuansfer.client.business.BizIds;
  * @date 2019-08-16
  * @desc 向server发起金额推送
  */
-public class PreOrderPosRequest extends BaseRequest {
+public class OrderPayRequest extends BaseRequest {
 
     private String reference;
     private double amount;
 
-    public PreOrderPosRequest(String reference, double amount) {
+    public OrderPayRequest(String reference, double amount) {
         this.reference = reference;
         this.amount = amount;
     }
@@ -36,12 +36,12 @@ public class PreOrderPosRequest extends BaseRequest {
 
     @Override
     public String getBizId() {
-        return BizIds.PreOrderPos.name();
+        return BizIds.OrderPay.name();
     }
 
     @Override
     public String toString() {
-        return "PreOrderPosRequest{" +
+        return "OrderPayRequest{" +
                 "reference='" + reference + '\'' +
                 ", amount=" + amount +
                 '}';
