@@ -12,5 +12,7 @@ public enum BizIds {
     //预付款订单
     OrderPay,
     //定单退款
-    OrderRefund
+    OrderRefund,
+    //订单详情
+    OrderDetail
 }

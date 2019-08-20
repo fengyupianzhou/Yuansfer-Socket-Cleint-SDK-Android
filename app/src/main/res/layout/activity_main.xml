@@ -23,21 +23,21 @@
         android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="connect server"
+        android:text="启动服务"
         android:textAllCaps="false" />
 
     <Button
         android:id="@+id/btn2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="stop server"
+        android:text="停止服务"
         android:textAllCaps="false" />
 
     <Button
         android:id="@+id/btn4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="在Device上显示消息"
+        android:text="Terminal显示消息"
         android:textAllCaps="false" />
 
     <Button
@@ -59,7 +59,27 @@
             android:text="发起退款" />
 
         <EditText
-            android:id="@+id/edt_transaction"
+            android:id="@+id/edt_no_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="输入订单号" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="订单详情" />
+
+        <EditText
+            android:id="@+id/edt_no_two"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

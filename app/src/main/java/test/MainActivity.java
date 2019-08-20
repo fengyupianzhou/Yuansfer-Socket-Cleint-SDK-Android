@@ -10,8 +10,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yuansfer.app.R;
+import com.yuansfer.client.business.request.OrderDetailRequest;
 import com.yuansfer.client.business.request.OrderPayRequest;
 import com.yuansfer.client.business.request.OrderRefundRequest;
+import com.yuansfer.client.business.response.OrderDetailResponse;
 import com.yuansfer.client.business.response.OrderPayResponse;
 import com.yuansfer.client.business.response.OrderRefundResponse;
 import com.yuansfer.client.connect.PosClientManager;
@@ -24,7 +26,7 @@ import com.yuansfer.client.listener.ISessionListener;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvRet;
-    EditText etTransactionNo;
+    EditText etRefundNo, etDetailNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvRet = findViewById(R.id.tv_ret);
         tvRet.setMovementMethod(ScrollingMovementMethod.getInstance());
-        etTransactionNo = findViewById(R.id.edt_transaction);
+        etRefundNo = findViewById(R.id.edt_no_one);
+        etDetailNo = findViewById(R.id.edt_no_two);
         final EditText etIP = findViewById(R.id.edt_ip);
         final EditText etPort = findViewById(R.id.edt_port);
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
@@ -63,11 +66,21 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TextUtils.isEmpty(etTransactionNo.getText().toString())) {
+                if (TextUtils.isEmpty(etRefundNo.getText().toString())) {
                     Toast.makeText(MainActivity.this, "请输入订单号", Toast.LENGTH_LONG).show();
                     return;
                 }
                 orderRefund();
+            }
+        });
+        findViewById(R.id.btn6).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (TextUtils.isEmpty(etDetailNo.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "请输入订单号", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                orderDetail();
             }
         });
         PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
@@ -133,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void orderRefund() {
         OrderRefundRequest request = new OrderRefundRequest();
-        request.setTransactionNo(etTransactionNo.getText().toString());
+        request.setTransactionNo(etRefundNo.getText().toString());
         request.setRefundAdmAccId("3000140017");
         request.setRefundAdmPassword("111111");
         request.setRefundAmount(0.01);
@@ -146,6 +159,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFail(int errorCode, String errorMsg) {
                 tvRet.append("退款失败：" + errorMsg + "\n");
+            }
+        });
+    }
+
+    private void orderDetail() {
+        OrderDetailRequest request = new OrderDetailRequest(etDetailNo.getText().toString());
+        PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<OrderDetailResponse>() {
+            @Override
+            public void onSuccess(OrderDetailResponse response) {
+                tvRet.append("查询订单成功：" + response.getOrderDetail().getTransactionReferNo() + "\n");
+            }
+
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                tvRet.append("查询订单失败：" + errorMsg + "\n");
             }
         });
     }
