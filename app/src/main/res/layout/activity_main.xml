@@ -34,23 +34,38 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="发起0.01$的金额下单"
-        android:textAllCaps="false" />
-    <Button
-        android:id="@+id/btn5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="发起0.02$的金额下单"
-        android:textAllCaps="false" />
-    <Button
         android:id="@+id/btn4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="在Device上显示消息"
         android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发起0.01$的金额下单"
+        android:textAllCaps="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发起退款" />
+
+        <EditText
+            android:id="@+id/edt_transaction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="输入订单号" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_ret"

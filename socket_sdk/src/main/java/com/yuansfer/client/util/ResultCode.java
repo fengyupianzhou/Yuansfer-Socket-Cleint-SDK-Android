@@ -32,6 +32,10 @@ public class ResultCode {
      */
     public static final int USER_CANCELLED = -5;
     /**
+     * 网络不在线
+     */
+    public static final int NETWORK_OFFLINE = -6;
+    /**
      * 未知错误
      */
     public static final int UNKNOWN_ERROR = -8;

@@ -2,14 +2,18 @@ package test;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yuansfer.app.R;
 import com.yuansfer.client.business.request.OrderPayRequest;
+import com.yuansfer.client.business.request.OrderRefundRequest;
 import com.yuansfer.client.business.response.OrderPayResponse;
+import com.yuansfer.client.business.response.OrderRefundResponse;
 import com.yuansfer.client.connect.PosClientManager;
 import com.yuansfer.client.connect.PIOSession;
 import com.yuansfer.client.listener.AbstractMsgReceivedListener;
@@ -20,6 +24,7 @@ import com.yuansfer.client.listener.ISessionListener;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvRet;
+    EditText etTransactionNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvRet = findViewById(R.id.tv_ret);
         tvRet.setMovementMethod(ScrollingMovementMethod.getInstance());
+        etTransactionNo = findViewById(R.id.edt_transaction);
         final EditText etIP = findViewById(R.id.edt_ip);
         final EditText etPort = findViewById(R.id.edt_port);
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
@@ -48,16 +54,20 @@ public class MainActivity extends AppCompatActivity {
                 preOrder(0.01);
             }
         });
-        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                preOrder(0.02);
-            }
-        });
         findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PosClientManager.getInstance().showMessage("show message on yuansfer pos terminal");
+            }
+        });
+        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (TextUtils.isEmpty(etTransactionNo.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "请输入订单号", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                orderRefund();
             }
         });
         PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
@@ -111,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 , new IMsgReplyListener<OrderPayResponse>() {
                     @Override
                     public void onSuccess(OrderPayResponse response) {
-                        tvRet.append("支付成功，交易结果：" + response + "\n");
+                        tvRet.append("支付成功，订单号：" + response.getOrderPay().getTransactionNo() + "\n");
                     }
 
                     @Override
@@ -119,6 +129,25 @@ public class MainActivity extends AppCompatActivity {
                         tvRet.append("支付失败：" + errMsg + "\n");
                     }
                 });
+    }
+
+    private void orderRefund() {
+        OrderRefundRequest request = new OrderRefundRequest();
+        request.setTransactionNo(etTransactionNo.getText().toString());
+        request.setRefundAdmAccId("3000140017");
+        request.setRefundAdmPassword("111111");
+        request.setRefundAmount(0.01);
+        PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<OrderRefundResponse>() {
+            @Override
+            public void onSuccess(OrderRefundResponse response) {
+                tvRet.append("退款成功，订单号：" + response.getOrderRefund().getTransactionNo() + "\n");
+            }
+
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                tvRet.append("退款失败：" + errorMsg + "\n");
+            }
+        });
     }
 
     @Override
