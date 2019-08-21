@@ -10,9 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yuansfer.app.R;
+import com.yuansfer.client.business.bean.OrderDetailBean;
 import com.yuansfer.client.business.request.OrderDetailRequest;
 import com.yuansfer.client.business.request.OrderPayRequest;
 import com.yuansfer.client.business.request.OrderRefundRequest;
+import com.yuansfer.client.business.request.PrintCreditSaleRequest;
+import com.yuansfer.client.business.request.PrintQrCodeSaleRequest;
+import com.yuansfer.client.business.response.BaseResponse;
 import com.yuansfer.client.business.response.OrderDetailResponse;
 import com.yuansfer.client.business.response.OrderPayResponse;
 import com.yuansfer.client.business.response.OrderRefundResponse;
@@ -27,6 +31,7 @@ import com.yuansfer.client.listener.ISessionListener;
 public class MainActivity extends AppCompatActivity {
     TextView tvRet;
     EditText etRefundNo, etDetailNo;
+    OrderDetailBean orderDetailBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +86,18 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 orderDetail();
+            }
+        });
+        findViewById(R.id.btn7).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                printCredit();
+            }
+        });
+        findViewById(R.id.btn8).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                printQrCode();
             }
         });
         PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
@@ -168,12 +185,84 @@ public class MainActivity extends AppCompatActivity {
         PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<OrderDetailResponse>() {
             @Override
             public void onSuccess(OrderDetailResponse response) {
-                tvRet.append("查询订单成功：" + response.getOrderDetail().getTransactionReferNo() + "\n");
+                orderDetailBean = response.getOrderDetail();
+                tvRet.append("查询订单成功：" + orderDetailBean.getSupplierTransactionNo() + "\n");
             }
 
             @Override
             public void onFail(int errorCode, String errorMsg) {
                 tvRet.append("查询订单失败：" + errorMsg + "\n");
+            }
+        });
+    }
+
+    private void printCredit() {
+        if (orderDetailBean == null) {
+            Toast.makeText(this, "请先获取订单详情", Toast.LENGTH_LONG).show();
+            return;
+        }
+        PrintCreditSaleRequest request = new PrintCreditSaleRequest();
+        request.setAmount(orderDetailBean.getAmount());
+        request.setConvenientFee(orderDetailBean.getConvenientFee());
+        request.setConvenientFeeRemovedAmount(orderDetailBean.getConvenientFeeRemovedAmount());
+        request.setCurrency(orderDetailBean.getCurrency());
+        request.setSupplierPayTime(orderDetailBean.getSupplierPayTime());
+        request.setSupplierTransactionNo(orderDetailBean.getSupplierTransactionNo());
+        request.setTax(orderDetailBean.getTax());
+        request.setTaxRemovedAmount(orderDetailBean.getTaxRemovedAmount());
+        request.setUserLoginId(orderDetailBean.getUserLoginId());
+        OrderDetailBean.TsysExtraInfoBean tSys = orderDetailBean.getTsysExtraInfo();
+        if (tSys != null) {
+            request.setAid(tSys.getAid());
+            request.setAuthCode(tSys.getAuthCode());
+            request.setCredDebitType(tSys.getCredDebitType());
+            request.setCredType(tSys.getCredType());
+            request.setEntryModel(tSys.getEntryModel());
+        }
+        PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<BaseResponse>() {
+            @Override
+            public void onSuccess(BaseResponse response) {
+                Toast.makeText(MainActivity.this, "打印成功", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, "打印失败:" + errorMsg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void printQrCode() {
+        if (orderDetailBean == null) {
+            Toast.makeText(this, "请先获取订单详情", Toast.LENGTH_LONG).show();
+            return;
+        }
+        PrintQrCodeSaleRequest request = new PrintQrCodeSaleRequest();
+        request.setAmount(orderDetailBean.getAmount());
+        request.setConvenientFee(orderDetailBean.getConvenientFee());
+        request.setConvenientFeeRemovedAmount(orderDetailBean.getConvenientFeeRemovedAmount());
+        request.setCurrency(orderDetailBean.getCurrency());
+        request.setSupplierUserLoginId(orderDetailBean.getUserLoginId());
+        request.setSupplierPayTime(orderDetailBean.getSupplierPayTime());
+        request.setSupplierTransId(orderDetailBean.getSupplierTransactionNo());
+        request.setTax(orderDetailBean.getTax());
+        request.setTaxRemovedAmount(orderDetailBean.getTaxRemovedAmount());
+        request.setCashierNo(orderDetailBean.getCashierNo());
+        request.setExchangeRate(orderDetailBean.getExchangeRate());
+        request.setNetReceivable(orderDetailBean.getNetReceivable());
+        request.setPaymentChannelValue(orderDetailBean.getPaymentChannelValue());
+        request.setRefundAmount(orderDetailBean.getRefundAmount());
+        request.setTransactionNo(orderDetailBean.getTransactionNo());
+        request.setTip(orderDetailBean.getTip());
+        PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<BaseResponse>() {
+            @Override
+            public void onSuccess(BaseResponse response) {
+                Toast.makeText(MainActivity.this, "打印成功", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFail(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, "打印失败:" + errorMsg, Toast.LENGTH_LONG).show();
             }
         });
     }

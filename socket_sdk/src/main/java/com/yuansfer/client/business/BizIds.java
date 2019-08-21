@@ -14,5 +14,9 @@ public enum BizIds {
     //定单退款
     OrderRefund,
     //订单详情
-    OrderDetail
+    OrderDetail,
+    //信用卡消费打印
+    PrintCreditSale,
+    //二维码消费打印
+    PrintQrCodeSale
 }
