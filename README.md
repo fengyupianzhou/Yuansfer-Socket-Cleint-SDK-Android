@@ -99,7 +99,8 @@ PosClientManager.getInstance().stopDeviceConnect(Context context)
 ```
 
 ### 其它说明
-* 接下来可定义一些具体功能性请求/响应接口，完善该方案的细节处理。另外Client访问安全控制也要考虑添加……
+* API请求调用是通过PosClientManager.getInstance().sendMessage()发起
+，传入不同的Request后和回调监听即可，具体详见API说明文档。
 
 ### 版本日志
 
