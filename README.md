@@ -6,7 +6,7 @@ Yuansfer-Socket-Client-SDK-Android是使用socket通信方式与Yuansfer的POS�
 ```
 dependencies {
     ...
-    compile 'com.yuansfer.sdk:socket-client:0.2.0'
+    implementation 'com.yuansfer.sdk:socket-client:0.2.0'
 }
 ```
 
