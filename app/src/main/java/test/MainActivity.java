@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 , new IMsgReplyListener<OrderPayResponse>() {
                     @Override
                     public void onSuccess(OrderPayResponse response) {
-                        tvRet.append("支付成功，订单号：" + response.getOrderPay() + "\n");
+                        tvRet.append("支付成功，订单：" + response.getOrderPay() + "\n");
                     }
 
                     @Override
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<OrderRefundResponse>() {
             @Override
             public void onSuccess(OrderRefundResponse response) {
-                tvRet.append("退款成功，订单号：" + response.getOrderRefund() + "\n");
+                tvRet.append("退款成功，订单：" + response.getOrderRefund() + "\n");
             }
 
             @Override
