@@ -490,4 +490,36 @@ public class OrderDetailBean implements Parcelable {
         }
     };
 
+    @Override
+    public String toString() {
+        return "OrderDetailBean{" +
+                "transactionNo='" + transactionNo + '\'' +
+                ", amount=" + amount +
+                ", refundAmount=" + refundAmount +
+                ", netReceivable=" + netReceivable +
+                ", exchangeRate='" + exchangeRate + '\'' +
+                ", alipayUserLoginId='" + alipayUserLoginId + '\'' +
+                ", refundInfo='" + refundInfo + '\'' +
+                ", supplierPayTime='" + supplierPayTime + '\'' +
+                ", hasRefund=" + hasRefund +
+                ", supplierTransactionNo='" + supplierTransactionNo + '\'' +
+                ", transactionReferNo='" + transactionReferNo + '\'' +
+                ", currency='" + currency + '\'' +
+                ", tax=" + tax +
+                ", convenientFee=" + convenientFee +
+                ", taxRemovedAmount=" + taxRemovedAmount +
+                ", convenientFeeRemovedAmount=" + convenientFeeRemovedAmount +
+                ", tip=" + tip +
+                ", cashierNo='" + cashierNo + '\'' +
+                ", paymentChannelValue='" + paymentChannelValue + '\'' +
+                ", userLoginId='" + userLoginId + '\'' +
+                ", vendor='" + vendor + '\'' +
+                ", voidAmount=" + voidAmount +
+                ", hasVoid=" + hasVoid +
+                ", tsysExtraInfo=" + tsysExtraInfo +
+                ", authFlag=" + authFlag +
+                ", authAmount=" + authAmount +
+                ", batched='" + batched + '\'' +
+                '}';
+    }
 }

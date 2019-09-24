@@ -128,4 +128,19 @@ public class OrderRefundBean {
         this.paymentChannelValue = paymentChannelValue;
     }
 
+    @Override
+    public String toString() {
+        return "OrderRefundBean{" +
+                "amount=" + amount +
+                ", createTime=" + createTime +
+                ", paymentTime=" + paymentTime +
+                ", cashierNo='" + cashierNo + '\'' +
+                ", supplierTransId='" + supplierTransId + '\'' +
+                ", supplierUserLoginId='" + supplierUserLoginId + '\'' +
+                ", supplierPayTime='" + supplierPayTime + '\'' +
+                ", transactionNo='" + transactionNo + '\'' +
+                ", originalTransactionNo='" + originalTransactionNo + '\'' +
+                ", paymentChannelValue='" + paymentChannelValue + '\'' +
+                '}';
+    }
 }
