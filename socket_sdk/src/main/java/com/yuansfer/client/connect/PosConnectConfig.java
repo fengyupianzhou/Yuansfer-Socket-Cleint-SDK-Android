@@ -8,7 +8,7 @@ import android.os.Parcelable;
  * @CreateDate 2019/6/24 18:16
  * @Desciption Socket配置
  */
-public class ConnectConfig implements Parcelable {
+public class PosConnectConfig implements Parcelable {
 
     public static final int DEFAULT_PORT = 6189;   //默认端口
     public static final int DEFAULT_IDLE_TIME = 30;    //空间时间间隔
@@ -22,7 +22,7 @@ public class ConnectConfig implements Parcelable {
     private int bufferSize;
     private int retryConnTimes;
 
-    private ConnectConfig(SocketConfigBuilder builder) {
+    private PosConnectConfig(SocketConfigBuilder builder) {
         this.remoteAddress = builder.remoteAddress;
         this.remotePort = builder.remotePort;
         this.idleTime = builder.idleTime;
@@ -31,7 +31,7 @@ public class ConnectConfig implements Parcelable {
         this.retryConnTimes = builder.retryConnTimes;
     }
 
-    protected ConnectConfig(Parcel in) {
+    protected PosConnectConfig(Parcel in) {
         remoteAddress = in.readString();
         remotePort = in.readInt();
         idleTime = in.readInt();
@@ -78,8 +78,8 @@ public class ConnectConfig implements Parcelable {
             return this;
         }
 
-        public ConnectConfig build() {
-            return new ConnectConfig(this);
+        public PosConnectConfig build() {
+            return new PosConnectConfig(this);
         }
 
     }
@@ -99,15 +99,15 @@ public class ConnectConfig implements Parcelable {
         return 0;
     }
 
-    public static final Creator<ConnectConfig> CREATOR = new Creator<ConnectConfig>() {
+    public static final Creator<PosConnectConfig> CREATOR = new Creator<PosConnectConfig>() {
         @Override
-        public ConnectConfig createFromParcel(Parcel in) {
-            return new ConnectConfig(in);
+        public PosConnectConfig createFromParcel(Parcel in) {
+            return new PosConnectConfig(in);
         }
 
         @Override
-        public ConnectConfig[] newArray(int size) {
-            return new ConnectConfig[size];
+        public PosConnectConfig[] newArray(int size) {
+            return new PosConnectConfig[size];
         }
     };
 

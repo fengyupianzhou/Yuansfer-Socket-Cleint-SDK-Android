@@ -12,18 +12,18 @@ import java.nio.charset.Charset;
  * @CreateDate 2019/6/27 10:12
  * @Desciption 自定义编解码工厂
  */
-public class SocketProtocolCodecFactory implements ProtocolCodecFactory {
+public class PosProtocolCodecFactory implements ProtocolCodecFactory {
 
-    private final SocketProtocolEncoder mSocketEncoder;
-    private final SocketProtocolDecoder mSocketDecoder;
+    private final PosProtocolEncoder mSocketEncoder;
+    private final PosProtocolDecoder mSocketDecoder;
 
-    public SocketProtocolCodecFactory() {
+    public PosProtocolCodecFactory() {
         this(Charset.forName("UTF-8"));
     }
 
-    public SocketProtocolCodecFactory(Charset charset) {
-        mSocketEncoder = new SocketProtocolEncoder(charset);
-        mSocketDecoder = new SocketProtocolDecoder(charset);
+    public PosProtocolCodecFactory(Charset charset) {
+        mSocketEncoder = new PosProtocolEncoder(charset);
+        mSocketDecoder = new PosProtocolDecoder(charset);
     }
 
     @Override

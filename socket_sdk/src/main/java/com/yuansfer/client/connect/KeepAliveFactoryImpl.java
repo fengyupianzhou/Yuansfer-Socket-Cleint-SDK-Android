@@ -1,6 +1,6 @@
 package com.yuansfer.client.connect;
 
-import com.yuansfer.client.protocol.SocketMessage;
+import com.yuansfer.client.protocol.PosMessage;
 
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.keepalive.KeepAliveMessageFactory;
@@ -13,7 +13,7 @@ import org.apache.mina.filter.keepalive.KeepAliveMessageFactory;
 public class KeepAliveFactoryImpl implements KeepAliveMessageFactory {
 
     public boolean isRequest(IoSession session, Object message) {
-        return SocketMessage.HEART_BEAT_FLAG == ((SocketMessage) message).getFlag();
+        return PosMessage.HEART_BEAT_FLAG == ((PosMessage) message).getFlag();
     }
 
     public boolean isResponse(IoSession session, Object message) {
@@ -25,7 +25,7 @@ public class KeepAliveFactoryImpl implements KeepAliveMessageFactory {
     }
 
     public Object getResponse(IoSession session, Object request) {
-        return SocketMessage.obtain(SocketMessage.HEART_BEAT_FLAG, null);
+        return PosMessage.obtain(PosMessage.HEART_BEAT_FLAG, null);
     }
 
 }

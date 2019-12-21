@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.yuansfer.client.protocol.SocketProtocolCodecFactory;
+import com.yuansfer.client.protocol.PosProtocolCodecFactory;
 import com.yuansfer.client.util.LogUtils;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -34,8 +34,8 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
     private static final int SOCKET_CONN_OPEN_WHAT = SESSION_MSG_RECEIVE_WHAT + 1;
     private static final int SOCKET_CONN_CLOSE_WHAT = SOCKET_CONN_OPEN_WHAT + 1;
     private NioSocketConnector mSocketConnector;
-    private RetryConnectHandler mConnectHandler;
-    private ConnectConfig mSocketConfig;
+    private PosRetryConnectHandler mConnectHandler;
+    private PosConnectConfig mSocketConfig;
     private Context mContext;
     private static Handler sHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -81,7 +81,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
         }
     }
 
-    public PosClientConnector(Context context, ConnectConfig config) {
+    public PosClientConnector(Context context, PosConnectConfig config) {
         mContext = context;
         initConnector(config);
     }
@@ -91,7 +91,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
      *
      * @param config
      */
-    private void initConnector(ConnectConfig config) {
+    private void initConnector(PosConnectConfig config) {
         mSocketConfig = config;
         mSocketConnector = new NioSocketConnector();
         mSocketConnector.setConnectTimeoutMillis(1000 * config.getConnTimeout());
@@ -99,7 +99,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
         mSocketConnector.getSessionConfig().setReadBufferSize(config.getBufferSize());
         mSocketConnector.getSessionConfig().setKeepAlive(true);
         mSocketConnector.getFilterChain().addLast("logging", new LoggingFilter());
-        mSocketConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new SocketProtocolCodecFactory()));
+        mSocketConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PosProtocolCodecFactory()));
         mSocketConnector.getFilterChain().addLast("heartbeat", new KeepAliveFilter(new KeepAliveFactoryImpl()));
         mSocketConnector.setHandler(this);
         mSocketConnector.addListener(this);
@@ -115,10 +115,10 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
         sendQuitMessageIfNeed();
         HandlerThread handlerThread = new HandlerThread("PosClientConnector");
         handlerThread.start();
-        mConnectHandler = new RetryConnectHandler(mContext, mSocketConnector, mSocketConfig.getRemoteAddress()
+        mConnectHandler = new PosRetryConnectHandler(mContext, mSocketConnector, mSocketConfig.getRemoteAddress()
                 , mSocketConfig.getRemotePort(), mSocketConfig.getRetryConnTimes(), handlerThread.getLooper());
-        mConnectHandler.sendEmptyMessage(RetryConnectHandler.INIT_WHAT);
-        mConnectHandler.sendEmptyMessage(RetryConnectHandler.CONN_WHAT);
+        mConnectHandler.sendEmptyMessage(PosRetryConnectHandler.INIT_WHAT);
+        mConnectHandler.sendEmptyMessage(PosRetryConnectHandler.CONN_WHAT);
     }
 
     /**
@@ -136,7 +136,7 @@ public class PosClientConnector extends IoHandlerAdapter implements IoServiceLis
     private void sendQuitMessageIfNeed() {
         if (mConnectHandler != null
                 && !mConnectHandler.isThreadClosed()) {
-            mConnectHandler.sendEmptyMessage(RetryConnectHandler.DIS_WHAT);
+            mConnectHandler.sendEmptyMessage(PosRetryConnectHandler.DIS_WHAT);
             mConnectHandler = null;
         }
     }

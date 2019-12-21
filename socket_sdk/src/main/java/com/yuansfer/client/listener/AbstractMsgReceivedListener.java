@@ -1,6 +1,6 @@
 package com.yuansfer.client.listener;
 
-import com.yuansfer.client.connect.PIOSession;
+import com.yuansfer.client.connect.PosSession;
 
 /**
  * @Author Fly-Android
@@ -9,17 +9,17 @@ import com.yuansfer.client.connect.PIOSession;
  */
 public abstract class AbstractMsgReceivedListener implements ISessionListener {
     @Override
-    public void onSessionAdd(PIOSession session) {
+    public void onSessionAdd(PosSession session) {
 
     }
 
     @Override
-    public void onSessionRemove(PIOSession session) {
+    public void onSessionRemove(PosSession session) {
 
     }
 
     @Override
-    public void onMessageSent(PIOSession session, Object msg) {
+    public void onMessageSent(PosSession session, Object msg) {
 
     }
 

@@ -6,7 +6,7 @@ package com.yuansfer.client.protocol;
  * @CreateDate 2019/6/27 9:23
  * @Desciption 消息包
  */
-public class SocketMessage {
+public class PosMessage {
 
     //心跳消息flag
     public static final byte HEART_BEAT_FLAG = (byte) 0xFF;
@@ -21,7 +21,7 @@ public class SocketMessage {
     //消息体内容
     private String mContent;
 
-    private SocketMessage(byte flag, String content) {
+    private PosMessage(byte flag, String content) {
         this.mFlag = flag;
         this.mContent = content;
         mLength = SOCKET_HEAD_LENGTH + (content == null ? 0 : content.getBytes().length);
@@ -47,17 +47,17 @@ public class SocketMessage {
         this.mContent = mContent;
     }
 
-    public static SocketMessage obtain(String content) {
-        return new SocketMessage(COMMON_MSG_FLAG, content);
+    public static PosMessage obtain(String content) {
+        return new PosMessage(COMMON_MSG_FLAG, content);
     }
 
-    public static SocketMessage obtain(byte flag, String content) {
-        return new SocketMessage(flag, content);
+    public static PosMessage obtain(byte flag, String content) {
+        return new PosMessage(flag, content);
     }
 
     @Override
     public String toString() {
-        return "SocketMessage{" +
+        return "PosMessage{" +
                 "mLength=" + mLength +
                 ", mFlag=" + mFlag +
                 ", mContent='" + mContent + '\'' +

@@ -19,7 +19,7 @@ import java.net.InetSocketAddress;
  * @CreateDate 2019/6/25 15:19
  * @Desciption Socket重连处理器
  */
-public class RetryConnectHandler extends Handler implements Runnable {
+public class PosRetryConnectHandler extends Handler implements Runnable {
 
     public static final int INIT_WHAT = 0;
     public static final int CONN_WHAT = INIT_WHAT + 1;
@@ -33,7 +33,7 @@ public class RetryConnectHandler extends Handler implements Runnable {
     private int mConnTime = 0;
     private boolean isThreadClosed;
 
-    public RetryConnectHandler(Context context, NioSocketConnector connector
+    public PosRetryConnectHandler(Context context, NioSocketConnector connector
             , String address, int port, int retryConnTime, Looper looper) {
         super(looper);
         mContext = context;
@@ -71,10 +71,9 @@ public class RetryConnectHandler extends Handler implements Runnable {
         try {
             ConnectFuture connectFuture = mSocketConnector.connect();
             connectFuture.awaitUninterruptibly();
-            IoSession session = connectFuture.getSession();
-            if (session.isConnected()) {
+            if (connectFuture.isConnected()) {
                 LogUtils.d("连接成功");
-                PosClientManager.getInstance().saveSession(session);
+                PosClientManager.getInstance().saveSession(connectFuture.getSession());
                 //安全退出Looper线程
                 getLooper().quitSafely();
                 isThreadClosed = true;

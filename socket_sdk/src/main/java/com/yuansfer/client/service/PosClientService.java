@@ -7,7 +7,7 @@ import android.os.IBinder;
 
 import com.yuansfer.client.netmonitor.NetChangeObserver;
 import com.yuansfer.client.netmonitor.NetMonitor;
-import com.yuansfer.client.connect.ConnectConfig;
+import com.yuansfer.client.connect.PosConnectConfig;
 import com.yuansfer.client.connect.PosClientConnector;
 import com.yuansfer.client.util.LogUtils;
 
@@ -22,16 +22,16 @@ public class PosClientService extends Service implements NetChangeObserver {
     private PosClientConnector mSocketConnector;
 
     public static void startService(Context context, String remoteAddr) {
-        startService(context, remoteAddr, ConnectConfig.DEFAULT_PORT);
+        startService(context, remoteAddr, PosConnectConfig.DEFAULT_PORT);
     }
 
     public static void startService(Context context, String remoteAddr, int remotePort) {
-        ConnectConfig.SocketConfigBuilder builder = new ConnectConfig.SocketConfigBuilder()
+        PosConnectConfig.SocketConfigBuilder builder = new PosConnectConfig.SocketConfigBuilder()
                 .setRemoteAddress(remoteAddr).setRemotePort(remotePort);
         startService(context, builder.build());
     }
 
-    public static void startService(Context context, ConnectConfig config) {
+    public static void startService(Context context, PosConnectConfig config) {
         Intent intent = new Intent(ACTION_SOCKET_SERVER_SERVICE);
         intent.setPackage(context.getPackageName());
         intent.putExtra("config", config);
@@ -59,7 +59,7 @@ public class PosClientService extends Service implements NetChangeObserver {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && mSocketConnector == null) {
-            ConnectConfig config = intent.getParcelableExtra("config");
+            PosConnectConfig config = intent.getParcelableExtra("config");
             mSocketConnector = new PosClientConnector(this, config);
         }
         return Service.START_STICKY;

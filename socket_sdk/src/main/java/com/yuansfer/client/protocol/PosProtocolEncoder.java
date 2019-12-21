@@ -12,21 +12,21 @@ import java.nio.charset.Charset;
  * @CreateDate 2019/6/27 9:47
  * @Desciption Socket消息编码器
  */
-public class SocketProtocolEncoder implements ProtocolEncoder {
+public class PosProtocolEncoder implements ProtocolEncoder {
 
     private Charset mCharset;
 
-    public SocketProtocolEncoder() {
+    public PosProtocolEncoder() {
         this.mCharset = Charset.defaultCharset();
     }
 
-    public SocketProtocolEncoder(Charset charset) {
+    public PosProtocolEncoder(Charset charset) {
         this.mCharset = charset;
     }
 
     @Override
     public void encode(IoSession ioSession, Object o, ProtocolEncoderOutput out) throws Exception {
-        SocketMessage socketMessage = (SocketMessage) o;
+        PosMessage socketMessage = (PosMessage) o;
         IoBuffer ioBuffer = IoBuffer.allocate(socketMessage.getLength());
         ioBuffer.setAutoExpand(true);
         ioBuffer.putInt(socketMessage.getLength());

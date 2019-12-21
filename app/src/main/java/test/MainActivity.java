@@ -21,7 +21,7 @@ import com.yuansfer.client.business.response.OrderDetailResponse;
 import com.yuansfer.client.business.response.OrderPayResponse;
 import com.yuansfer.client.business.response.OrderRefundResponse;
 import com.yuansfer.client.connect.PosClientManager;
-import com.yuansfer.client.connect.PIOSession;
+import com.yuansfer.client.connect.PosSession;
 import com.yuansfer.client.listener.AbstractMsgReceivedListener;
 import com.yuansfer.client.listener.IConnectStateListener;
 import com.yuansfer.client.listener.IMsgReplyListener;
@@ -114,17 +114,17 @@ public class MainActivity extends AppCompatActivity {
 
         PosClientManager.getInstance().setOnSessionListener(new ISessionListener() {
             @Override
-            public void onSessionAdd(PIOSession session) {
+            public void onSessionAdd(PosSession session) {
                 tvRet.append(String.format("Socket客户端已连接服务器%s\n", session.getRemoteAddress()));
             }
 
             @Override
-            public void onSessionRemove(PIOSession session) {
+            public void onSessionRemove(PosSession session) {
                 tvRet.append(String.format("Socket客户端已退出服务器%s\n", session.getRemoteAddress()));
             }
 
             @Override
-            public void onMessageSent(PIOSession session, Object msg) {
+            public void onMessageSent(PosSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端发送了消息：%s\n", msg.toString()));
             }
 
@@ -134,13 +134,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onMessageReceive(PIOSession session, Object msg) {
+            public void onMessageReceive(PosSession session, Object msg) {
                 tvRet.append(String.format("Socket客户端收到服务端发来的消息：%s\n", msg.toString()));
             }
         });
         PosClientManager.getInstance().setOnSessionListener(new AbstractMsgReceivedListener() {
             @Override
-            public void onMessageReceive(PIOSession session, Object msg) {
+            public void onMessageReceive(PosSession session, Object msg) {
 
             }
         });

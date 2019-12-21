@@ -7,11 +7,11 @@ import com.google.gson.Gson;
 import com.yuansfer.client.business.request.BaseRequest;
 import com.yuansfer.client.business.request.ShowMessageRequest;
 import com.yuansfer.client.business.response.BaseResponse;
+import com.yuansfer.client.protocol.PosMessage;
 import com.yuansfer.client.service.PosClientService;
 import com.yuansfer.client.listener.IConnectStateListener;
 import com.yuansfer.client.listener.IMsgReplyListener;
 import com.yuansfer.client.listener.ISessionListener;
-import com.yuansfer.client.protocol.SocketMessage;
 import com.yuansfer.client.util.ResultCode;
 
 import org.apache.mina.core.session.IoSession;
@@ -54,7 +54,7 @@ public class PosClientManager {
      *
      * @return
      */
-    public boolean isConnSuccess() {
+    private boolean isConnSuccess() {
         return mSession != null && mSession.isConnected();
     }
 
@@ -66,9 +66,9 @@ public class PosClientManager {
      */
     public boolean showMessage(String message) {
         if (isConnSuccess()) {
-            return mSession.write(SocketMessage.obtain(mGson.toJson(new ShowMessageRequest(message)))).isWritten();
+            return mSession.write(PosMessage.obtain(mGson.toJson(new ShowMessageRequest(message)))).isWritten();
         } else {
-            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(new ShowMessageRequest(message))), "not found server session");
+            mSessionListener.onMessageSendFail(PosMessage.obtain(mGson.toJson(new ShowMessageRequest(message))), "not found server session");
             return false;
         }
     }
@@ -81,9 +81,9 @@ public class PosClientManager {
      */
     public <T extends BaseRequest> boolean sendMessage(T request) {
         if (isConnSuccess()) {
-            return mSession.write(SocketMessage.obtain(mGson.toJson(request))).isWritten();
+            return mSession.write(PosMessage.obtain(mGson.toJson(request))).isWritten();
         } else {
-            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(request)), "not found server session");
+            mSessionListener.onMessageSendFail(PosMessage.obtain(mGson.toJson(request)), "not found server session");
             return false;
         }
     }
@@ -101,9 +101,9 @@ public class PosClientManager {
                 //需要server反馈时加入回调集合
                 mRespListenerMap.put(request.getRequestId(), listener);
             }
-            return mSession.write(SocketMessage.obtain(mGson.toJson(request))).isWritten();
+            return mSession.write(PosMessage.obtain(mGson.toJson(request))).isWritten();
         } else {
-            mSessionListener.onMessageSendFail(SocketMessage.obtain(mGson.toJson(request)), "not found server session");
+            mSessionListener.onMessageSendFail(PosMessage.obtain(mGson.toJson(request)), "not found server session");
             if (listener != null) {
                 listener.onFail(ResultCode.SESSION_CLOSED, "not found server session");
             }
@@ -159,7 +159,7 @@ public class PosClientManager {
      * @param context Context
      * @param config  配置项
      */
-    public void startDeviceConnect(Context context, ConnectConfig config) {
+    public void startDeviceConnect(Context context, PosConnectConfig config) {
         PosClientService.startService(context, config);
     }
 
@@ -208,7 +208,7 @@ public class PosClientManager {
             mSession = session;
         }
         if (mSessionListener != null) {
-            mSessionListener.onSessionAdd(new PIOSession(session.isConnected()
+            mSessionListener.onSessionAdd(new PosSession(session.isConnected()
                     , session.getRemoteAddress(), session.getLocalAddress()));
         }
     }
@@ -216,14 +216,14 @@ public class PosClientManager {
     void notifySessionDestroyed(IoSession session) {
         mSession = null;
         if (mSessionListener != null) {
-            mSessionListener.onSessionRemove(new PIOSession(session.isConnected()
+            mSessionListener.onSessionRemove(new PosSession(session.isConnected()
                     , session.getRemoteAddress(), session.getLocalAddress()));
         }
     }
 
     void notifySessionMessageSent(IoSession session, Object message) {
         if (mSessionListener != null) {
-            mSessionListener.onMessageSent(new PIOSession(session.isConnected()
+            mSessionListener.onMessageSent(new PosSession(session.isConnected()
                     , session.getRemoteAddress(), session.getLocalAddress()), message);
         }
     }
@@ -231,12 +231,12 @@ public class PosClientManager {
     void notifySessionMessageReceive(IoSession session, Object message) {
         IMsgReplyListener responseListener = null;
         if (mSessionListener != null) {
-            mSessionListener.onMessageReceive(new PIOSession(session.isConnected()
+            mSessionListener.onMessageReceive(new PosSession(session.isConnected()
                     , session.getRemoteAddress(), session.getLocalAddress()), message);
         }
         try {
-            if (message instanceof SocketMessage) {
-                SocketMessage socketMsg = (SocketMessage) message;
+            if (message instanceof PosMessage) {
+                PosMessage socketMsg = (PosMessage) message;
                 BaseResponse response = mGson.fromJson(socketMsg.getContent(), BaseResponse.class);
                 responseListener = mRespListenerMap.remove(response.getRequestId());
                 if (responseListener != null) {

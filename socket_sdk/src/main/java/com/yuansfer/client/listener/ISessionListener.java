@@ -1,6 +1,6 @@
 package com.yuansfer.client.listener;
 
-import com.yuansfer.client.connect.PIOSession;
+import com.yuansfer.client.connect.PosSession;
 
 
 /**
@@ -15,14 +15,14 @@ public interface ISessionListener {
      *
      * @param session 会话
      */
-    void onSessionAdd(PIOSession session);
+    void onSessionAdd(PosSession session);
 
     /**
      * 会话移除
      *
      * @param session 会话
      */
-    void onSessionRemove(PIOSession session);
+    void onSessionRemove(PosSession session);
 
     /**
      * 消息已送达
@@ -30,7 +30,7 @@ public interface ISessionListener {
      * @param session 会话
      * @param msg     消息内容
      */
-    void onMessageSent(PIOSession session, Object msg);
+    void onMessageSent(PosSession session, Object msg);
 
     /**
      * 消息发送失败
@@ -46,5 +46,5 @@ public interface ISessionListener {
      * @param session 会话
      * @param msg     消息内容
      */
-    void onMessageReceive(PIOSession session, Object msg);
+    void onMessageReceive(PosSession session, Object msg);
 }

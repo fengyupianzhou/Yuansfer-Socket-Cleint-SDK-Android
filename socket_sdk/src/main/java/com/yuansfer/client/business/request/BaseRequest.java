@@ -25,8 +25,8 @@ public abstract class BaseRequest {
     }
 
     /**
-     * 业务标识，类似接口名称
      *
+     * 业务标识，类似接口名称
      * @return
      */
     public abstract String getBizId();

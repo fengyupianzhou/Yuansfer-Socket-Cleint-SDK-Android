@@ -5,13 +5,13 @@ import java.net.SocketAddress;
 /**
  * 连接session
  */
-public class PIOSession {
+public class PosSession {
 
     private boolean isConnected;
     private SocketAddress remoteAddress;
     private SocketAddress localAddress;
 
-    public PIOSession(boolean isConnected, SocketAddress remoteAddress, SocketAddress localAddress) {
+    public PosSession(boolean isConnected, SocketAddress remoteAddress, SocketAddress localAddress) {
         this.isConnected = isConnected;
         this.remoteAddress = remoteAddress;
         this.localAddress = localAddress;

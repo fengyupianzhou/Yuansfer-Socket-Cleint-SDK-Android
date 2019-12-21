@@ -12,28 +12,28 @@ import java.nio.charset.Charset;
  * @CreateDate 2019/6/27 9:48
  * @Desciption socket消息解码器
  */
-public class SocketProtocolDecoder extends CumulativeProtocolDecoder {
+public class PosProtocolDecoder extends CumulativeProtocolDecoder {
 
     private Charset mCharset;
 
-    public SocketProtocolDecoder() {
+    public PosProtocolDecoder() {
         mCharset = Charset.defaultCharset();
     }
 
-    public SocketProtocolDecoder(Charset charset) {
+    public PosProtocolDecoder(Charset charset) {
         this.mCharset = charset;
     }
 
     @Override
     protected boolean doDecode(IoSession ioSession, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        if (in.remaining() < SocketMessage.SOCKET_HEAD_LENGTH) {
+        if (in.remaining() < PosMessage.SOCKET_HEAD_LENGTH) {
             //可读长度小于包头长度不读取
             return false;
         }
         if (in.remaining() > 1) {
             in.mark();
             int length = in.getInt(in.position());
-            if (in.remaining() < length - SocketMessage.SOCKET_HEAD_LENGTH) {
+            if (in.remaining() < length - PosMessage.SOCKET_HEAD_LENGTH) {
                 //可读长度小于总长度-包头长度则停止拆包
                 in.reset();
                 return false;
@@ -43,9 +43,9 @@ public class SocketProtocolDecoder extends CumulativeProtocolDecoder {
                 byte[] bytes = new byte[length];
                 in.get(bytes, 0, length);
                 byte flag = bytes[4];
-                String content = new String(bytes, SocketMessage.SOCKET_HEAD_LENGTH
-                        , length - SocketMessage.SOCKET_HEAD_LENGTH, mCharset);
-                out.write(SocketMessage.obtain(flag, content));
+                String content = new String(bytes, PosMessage.SOCKET_HEAD_LENGTH
+                        , length - PosMessage.SOCKET_HEAD_LENGTH, mCharset);
+                out.write(PosMessage.obtain(flag, content));
                 //若还有数据则粘包再次回调
                 return in.remaining() > 0;
             }
