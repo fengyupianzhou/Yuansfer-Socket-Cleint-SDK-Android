@@ -211,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         request.setTax(orderDetailBean.getTax());
         request.setTaxRemovedAmount(orderDetailBean.getTaxRemovedAmount());
         request.setUserLoginId(orderDetailBean.getUserLoginId());
+        request.setTransactionNo(orderDetailBean.getTransactionNo());
         OrderDetailBean.TsysExtraInfoBean tSys = orderDetailBean.getTsysExtraInfo();
         if (tSys != null) {
             request.setAid(tSys.getAid());

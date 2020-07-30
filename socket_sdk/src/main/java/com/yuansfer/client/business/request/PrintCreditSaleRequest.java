@@ -26,6 +26,7 @@ public class PrintCreditSaleRequest extends BaseRequest {
     private double taxRemovedAmount;
     private double convenientFee;
     private double convenientFeeRemovedAmount;
+    private String transactionNo;
 
     public String getUserLoginId() {
         return userLoginId;
@@ -161,6 +162,14 @@ public class PrintCreditSaleRequest extends BaseRequest {
 
     public void setConvenientFeeRemovedAmount(double convenientFeeRemovedAmount) {
         this.convenientFeeRemovedAmount = convenientFeeRemovedAmount;
+    }
+
+    public String getTransactionNo() {
+        return transactionNo;
+    }
+
+    public void setTransactionNo(String transactionNo) {
+        this.transactionNo = transactionNo;
     }
 
     @Override
