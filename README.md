@@ -1,5 +1,5 @@
 ## Yuansfer-Socket-Client-SDK-Android
-Yuansfer-Socket-Client-SDK-Android是使用socket通信方式与Yuansfer的POS设备进行点对点通信的Android Libary
+Yuansfer-Socket-Client-SDK-Android是与Yuansfer的POS N5设备进行局域网内点对点通信的Android Libary
 
 ### 快速接入
 * 添加依赖

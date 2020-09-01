@@ -38,7 +38,7 @@ publish {
     groupId = 'com.yuansfer.sdk'
     artifactId = "socket-client"
     publishVersion = '0.2.0'
-    desc = 'socket client'
+    desc = 'P2P Android client'
     website = 'https://github.com/fengyupianzhou/Yuansfer-Socket-Client-SDK-Android'
 }
 
