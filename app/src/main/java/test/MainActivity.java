@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yuansfer.app.R;
@@ -22,23 +21,22 @@ import com.yuansfer.client.business.response.OrderPayResponse;
 import com.yuansfer.client.business.response.OrderRefundResponse;
 import com.yuansfer.client.connect.PosClientManager;
 import com.yuansfer.client.connect.PosSession;
-import com.yuansfer.client.listener.AbstractMsgReceivedListener;
 import com.yuansfer.client.listener.IConnectStateListener;
 import com.yuansfer.client.listener.IMsgReplyListener;
 import com.yuansfer.client.listener.ISessionListener;
 
 
 public class MainActivity extends AppCompatActivity {
-    TextView tvRet;
-    EditText etRefundNo, etDetailNo;
+    EditText etRet, etRefundNo, etDetailNo;
     OrderDetailBean orderDetailBean;
+    int seqNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tvRet = findViewById(R.id.tv_ret);
-        tvRet.setMovementMethod(ScrollingMovementMethod.getInstance());
+        etRet = findViewById(R.id.tv_ret);
+        etRet.setMovementMethod(ScrollingMovementMethod.getInstance());
         etRefundNo = findViewById(R.id.edt_no_one);
         etDetailNo = findViewById(R.id.edt_no_two);
         final EditText etIP = findViewById(R.id.edt_ip);
@@ -103,45 +101,39 @@ public class MainActivity extends AppCompatActivity {
         PosClientManager.getInstance().setOnConnectStateListener(new IConnectStateListener() {
             @Override
             public void onDeviceConnected() {
-                tvRet.setText("Socket服务已连接\n");
+                setTextMessage("P2P服务已连接");
             }
 
             @Override
             public void onDeviceDisconnected() {
-                tvRet.setText("Socket服务已关闭\n");
+                setTextMessage("P2P服务已关闭");
             }
         });
 
         PosClientManager.getInstance().setOnSessionListener(new ISessionListener() {
             @Override
             public void onSessionAdd(PosSession session) {
-                tvRet.append(String.format("Socket客户端已连接服务器%s\n", session.getRemoteAddress()));
+                appendTextMessage(String.format("P2P客户端已连接服务器%s", session.getRemoteAddress()));
             }
 
             @Override
             public void onSessionRemove(PosSession session) {
-                tvRet.append(String.format("Socket客户端已退出服务器%s\n", session.getRemoteAddress()));
+                appendTextMessage(String.format("P2P客户端已退出服务器%s", session.getRemoteAddress()));
             }
 
             @Override
             public void onMessageSent(PosSession session, Object msg) {
-                tvRet.append(String.format("Socket客户端发送了消息：%s\n", msg.toString()));
+                appendTextMessage(String.format("P2P客户端发送了消息：%s", msg.toString()));
             }
 
             @Override
             public void onMessageSendFail(Object msg, String reason) {
-                tvRet.append(String.format("Socket客户发送消息失败：%s\n", reason));
+                appendTextMessage(String.format("P2P客户发送消息失败：%s", reason));
             }
 
             @Override
             public void onMessageReceive(PosSession session, Object msg) {
-                tvRet.append(String.format("Socket客户端收到服务端发来的消息：%s\n", msg.toString()));
-            }
-        });
-        PosClientManager.getInstance().setOnSessionListener(new AbstractMsgReceivedListener() {
-            @Override
-            public void onMessageReceive(PosSession session, Object msg) {
-
+                appendTextMessage(String.format("P2P客户端收到服务端发来的消息：%s", msg.toString()));
             }
         });
     }
@@ -151,12 +143,12 @@ public class MainActivity extends AppCompatActivity {
                 , new IMsgReplyListener<OrderPayResponse>() {
                     @Override
                     public void onSuccess(OrderPayResponse response) {
-                        tvRet.append("支付成功，订单：" + response.getOrderPay() + "\n");
+                        appendTextMessage("支付成功，订单：" + response.getOrderPay());
                     }
 
                     @Override
                     public void onFail(int errCode, String errMsg) {
-                        tvRet.append("支付失败：" + errMsg + "\n");
+                        appendTextMessage("支付失败：" + errMsg);
                     }
                 });
     }
@@ -170,12 +162,12 @@ public class MainActivity extends AppCompatActivity {
         PosClientManager.getInstance().sendMessage(request, new IMsgReplyListener<OrderRefundResponse>() {
             @Override
             public void onSuccess(OrderRefundResponse response) {
-                tvRet.append("退款成功，订单：" + response.getOrderRefund() + "\n");
+                appendTextMessage("退款成功，订单：" + response.getOrderRefund());
             }
 
             @Override
             public void onFail(int errorCode, String errorMsg) {
-                tvRet.append("退款失败：" + errorMsg + "\n");
+                appendTextMessage("退款失败：" + errorMsg);
             }
         });
     }
@@ -186,12 +178,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(OrderDetailResponse response) {
                 orderDetailBean = response.getOrderDetail();
-                tvRet.append("查询订单成功：" + orderDetailBean + "\n");
+                appendTextMessage("查询订单成功：" + orderDetailBean);
             }
 
             @Override
             public void onFail(int errorCode, String errorMsg) {
-                tvRet.append("查询订单失败：" + errorMsg + "\n");
+                appendTextMessage("查询订单失败：" + errorMsg);
             }
         });
     }
@@ -268,9 +260,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void setTextMessage(String msg) {
+        seqNo = 1;
+        etRet.setText(String.format("%s->%s\n", seqNo, msg));
+        etRet.setSelection(etRet.length());
+    }
+
+    private void appendTextMessage(String msg) {
+        etRet.append(String.format("%s->%s\n", ++seqNo, msg));
+        etRet.setSelection(etRet.length());
     }
 
 }

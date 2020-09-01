@@ -15,6 +15,44 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+        release {
+            keyAlias 'yuansfer'
+            keyPassword 'yuansfer'
+            storeFile file('../p2p.jks')
+            storePassword 'yuansfer'
+        }
+    }
+    buildTypes {
+        debug {
+            //混淆
+            minifyEnabled false
+            //Zipalign优化
+            zipAlignEnabled true
+            //加载默认混淆配置文件
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
+            signingConfig signingConfigs.release
+        }
+        release {
+            minifyEnabled true
+            //Zipalign优化
+            zipAlignEnabled true
+            debuggable false
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "yunasfer-p2p-${variant.name}-${variant.versionName}.apk"
+                }
+            }
+            signingConfig signingConfigs.release
+            jniDebuggable false
+            renderscriptDebuggable false
+        }
+    }
 }
 
 dependencies {
